@@ -2,7 +2,7 @@ package Lazyness;
 use warnings;
 use strict;
 use parent 'Exporter';
-our @EXPORT_OK = qw/ take takeWhile filter collect /;
+our @EXPORT_OK = qw/ take takeWhile filter fold /;
 our %EXPORT_TAGS = ( all =>  \@EXPORT_OK );
 
 our $VERSION = '0.01';
@@ -33,7 +33,7 @@ sub filter (&;$) {
     }
 }
 
-sub collect ($) {
+sub fold ($) {
     my ( $list ) = @_;
     my @r; 
     while ( defined ( my $element = $list->() ) ) {
@@ -44,7 +44,7 @@ sub collect ($) {
 
 # sub lgrep (&;$) {
 #     my ( $sub, $list ) = @_;
-#     collect filter $sub, $list;
+#     fold filter $sub, $list;
 # }
 
 =head1 NAME
@@ -62,8 +62,7 @@ Version 0.01
 Lazyness is an implementation of haskell functions using closures as
 parameters. 
 
-stolen from haskell: take, takeWhile, filter
-stolen from ruby: collect
+implements take, takeWhile, filter, fold
 
     use strict;
     use warnings;
@@ -85,15 +84,15 @@ stolen from ruby: collect
     while ( my $x = &$list ) { say $x }
 
     # also prints the 10 first evens
-    sub first_positive_evens { collect take shift, list_of_positive_evens }
+    sub first_positive_evens { fold take shift, list_of_positive_evens }
     say for first_positive_evens(10);
 
     # also prints the 10 first evens
-    sub top_10 { collect take 10, shift }
+    sub top_10 { fold take 10, shift }
     say for top_10 list_of_positive_evens;
 
     # also all evens under 20
-    sub under_20 { collect takeWhile { $_ < 20} shift }
+    sub under_20 { fold takeWhile { $_ < 20} shift }
     say for under_20 list_of_positive_evens;
 
 So in the real world, you can write
@@ -123,7 +122,7 @@ So in the real world, you can write
     sub all_bofh_friends (&) { filter { is_user } shift }
 
     say join ' = ', @$_{qw/login uid gid /}
-    for collect all_bofh_friends
+    for fold all_bofh_friends
 	{ $csv_parser->getline_hr( $passwd_entries ) }
 
 =head1 EXPORT
@@ -149,7 +148,7 @@ takes all elements of the closure that matches the $test
 
 =cut
 
-=head2 collect $closure
+=head2 fold $closure
 
 transform a closure to an array
 
@@ -157,7 +156,7 @@ transform a closure to an array
 
 =head2 lgrep (does't work)
 
-shortcut for collect filter 
+shortcut for fold filter 
 
 =cut
 

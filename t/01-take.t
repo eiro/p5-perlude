@@ -8,18 +8,18 @@ use YAML;
 my ( @input, $got, $expected );
 # 
 # @input    = qw/ test toto tata tutu et le reste /;
-# $got      = [collect takeWhile { /^t/ } sub { shift @input }];
+# $got      = [fold takeWhile { /^t/ } sub { shift @input }];
 # $expected = [qw/ test toto tata tutu /];
 # 
 # is_deeply( $got, $expected, "takeWhile works");
 
 # sub begins_with_t ($) { takeWhile { /^t/ } shift }
 # my @t = qw/ toto tata aha /;
-# print "$_\n" for collect begins_with_t sub { shift @t }
+# print "$_\n" for fold begins_with_t sub { shift @t }
 
 sub test_it {
     my ( $f, $input, $expected, $desc ) = @_;
-    my $got = [collect $f->( sub { shift @$input } ) ];
+    my $got = [fold $f->( sub { shift @$input } ) ];
     is_deeply( $got, $expected, $desc )
 	or diag YAML::Dump
 	{ got      => $got
@@ -51,7 +51,7 @@ for my $test (
 ) { test_it @$test }
 
 @input = qw/ foo bar test /;
-sub eat { collect take shift, sub { shift @input } };
+sub eat { fold take shift, sub { shift @input } };
 
 {
     my $take_test = 1;
