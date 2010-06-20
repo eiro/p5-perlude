@@ -50,10 +50,18 @@ for my $test (
 
 ) { test_it @$test }
 
-# @input    = qw/ this is a test for lazy_grep indeed /;
-# $got      = lgrep { /i/ } sub { shift @input };
-# $expected = [qw/ this is indeed /];
-# is_deeply( $got, $expected, "lgrep works" );
+@input = qw/ foo bar test /;
+sub eat { collect take shift, sub { shift @input } };
 
-
+{
+    my $take_test = 1;
+    for my $takes
+    ( [ [qw/ foo bar /] , [eat 2]  ]
+    , [ [qw/ test /]    , [eat 10] ]
+    , [ []              , [eat 10] ]
+    ) { my ( $expected, $got ) = @$takes;
+	is_deeply ( $got, $expected , "take test $take_test ok" );
+	$take_test++;
+    }
+}
 
