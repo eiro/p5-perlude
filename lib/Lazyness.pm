@@ -47,8 +47,6 @@ sub collect ($) {
 #     collect filter $sub, $list;
 # }
 
-
-
 =head1 NAME
 
 Lazyness - a taste of haskell in perl
@@ -100,30 +98,33 @@ stolen from ruby: collect
 
 So in the real world, you can write
 
+    #! /usr/bin/perl
+    use 5.10.0;
     use Lazyness ':all';
     use Text::CSV;
-    use YAML;
 
-    # everyone with a birth year < 1992 is an adult 
-    sub all_adults (&) {
-	filter {
-	    $$_{birthdate} ~~ /(?<year>\d{4})-/
-		and $+{year} < 1992
-	} shift
+    ( my $csv_parser = Text::CSV->new({ qw/ binary 1 sep_char : / })
+	    or die Text::CSV->error_diag
+    )->column_names(qw/ login passwd uid gid gecos home shell /);
+    # root:x:0:0:root:/root:/bin/bash
+
+    open my $passwd_entries,'getent passwd |' or die $!;
+
+    sub is_user {
+	has_primary_group( sub { $_ > 1000 })
+	&& $$_{login} ne 'nobody'
     }
 
-    sub get_an_adult_exemple { take 1, all_adults }
+    # has_primary_group [0,1000]
+    # has_primary_group 100
+    # has_primary_group ( sub { $_ > 1000 } )
+    sub has_primary_group  { shift ~~ $$_{gid} }
 
-    # opening CSV file 
-    ( my $csv = Text::CSV->new({qw/ binary 1 sep_char : /})
-	    or die Text::CSV->error_diag
-    )->column_names(qw/firstname lastname birthdate login /);
-    open my $fh,'users.csv' or die "$!";
+    sub all_bofh_friends (&) { filter { is_user } shift }
 
-    # make a YAML dump of an adult example 
-    say YAML::Dump [ get_an_adult_exemple { $csv->getline_hr($fh) } ];
-
-    # the $fh stopped at the next line. you can still use it
+    say join ' = ', @$_{qw/login uid gid /}
+    for collect all_bofh_friends
+	{ $csv_parser->getline_hr( $passwd_entries ) }
 
 =head1 EXPORT
 
