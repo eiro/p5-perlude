@@ -5,6 +5,50 @@ use parent 'Exporter';
 our @EXPORT_OK = qw/ take takeWhile filter collect /;
 our %EXPORT_TAGS = ( all =>  \@EXPORT_OK );
 
+our $VERSION = '0.01';
+
+sub take {
+    my ( $want_more, $some ) = @_;
+    sub { $want_more-- > 0 ?  $some->() : undef }
+}
+
+sub takeWhile (&;$) {
+    my ( $test, $list ) = @_;
+    sub {
+	my $block = $list || shift;
+	local $_ = $block->();
+	defined or return undef;
+	$test->() ? $_ : undef;
+    }
+}
+
+sub filter (&;$) {
+    my ( $test, $list ) = @_;
+    sub {
+	my $block = $list || shift;
+	while ( defined ( local $_ = $block->() ) ) {
+	    $test->() and return $_
+	}
+	undef;
+    }
+}
+
+sub collect ($) {
+    my ( $list ) = @_;
+    my @r; 
+    while ( defined ( my $element = $list->() ) ) {
+	push @r,$element
+    }
+    @r;
+}
+
+# sub lgrep (&;$) {
+#     my ( $sub, $list ) = @_;
+#     collect filter $sub, $list;
+# }
+
+
+
 =head1 NAME
 
 Lazyness - a taste of haskell in perl
@@ -14,8 +58,6 @@ Lazyness - a taste of haskell in perl
 Version 0.01
 
 =cut
-
-our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
@@ -93,26 +135,12 @@ takes $n elements to the closure
 
 =cut
 
-sub take {
-    my ( $want_more, $some ) = @_;
-    sub { $want_more-- > 0 ?  $some->() : undef }
-}
-
 =head2 takeWhile $test, $closures
 
 takes elements of the closure while test is true 
 
 =cut
 
-sub takeWhile (&;$) {
-    my ( $test, $list ) = @_;
-    sub {
-	my $block = $list || shift;
-	local $_ = $block->();
-	defined or return undef;
-	$test->() ? $_ : undef;
-    }
-}
 
 =head2 filter $test, $closures
 
@@ -120,43 +148,17 @@ takes all elements of the closure that matches the $test
 
 =cut
 
-sub filter (&;$) {
-    my ( $test, $list ) = @_;
-    sub {
-	my $block = $list || shift;
-	while ( defined ( local $_ = $block->() ) ) {
-	    $test->() and return $_
-	}
-	undef;
-    }
-}
-
 =head2 collect $closure
 
 transform a closure to an array
 
 =cut
 
-sub collect ($) {
-    my ( $list ) = @_;
-    my @r; 
-    while ( defined ( my $element = $list->() ) ) {
-	push @r,$element
-    }
-    @r;
-}
-
 =head2 lgrep (does't work)
 
 shortcut for collect filter 
 
 =cut
-
-# sub lgrep (&;$) {
-#     my ( $sub, $list ) = @_;
-#     collect filter $sub, $list;
-# }
-
 
 =head1 AUTHOR
 
