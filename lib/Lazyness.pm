@@ -95,7 +95,7 @@ takes $n elements to the closure
 
 sub take {
     my ( $want_more, $some ) = @_;
-    sub { $want_more-- ?  $some->() : undef }
+    sub { $want_more-- > 0 ?  $some->() : undef }
 }
 
 =head2 takeWhile $test, $closures
