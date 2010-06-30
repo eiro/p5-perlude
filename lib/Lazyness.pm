@@ -68,6 +68,17 @@ implements take, takeWhile, filter, fold
     use warnings;
     use Lazyness ':all';
 
+    say for fold take 10, sub { 1 }
+    say for fold
+	takeWhile { $_ < 300 }
+	do { my $x = 6; sub { $x*= 6 } }
+
+    my $pow6 = 
+	takeWhile { $_ < 300 }
+	do { my $x = 6; sub { $x*= 6 } }
+    ;
+    while ( my $x = &$pow6 ) { say $x }
+
     # all numbers from $x to infinity
     sub to_infinity_from {
 	my $start = shift;
