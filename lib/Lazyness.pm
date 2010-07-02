@@ -1,9 +1,15 @@
 package Lazyness;
 use warnings;
 use strict;
+
 use parent 'Exporter';
-our @EXPORT_OK = qw/ take takeWhile filter fold /;
-our %EXPORT_TAGS = ( all =>  \@EXPORT_OK );
+our %EXPORT_TAGS =
+( haskell => [qw/ take takeWhile filter fold mapM mapM_ cycle /]
+, dbi     => [qw/ prepare_sth dbi_stream /]
+, step    => [qw/ stepBy byPairs /] 
+);
+our @EXPORT_OK = map {@$_} values %EXPORT_TAGS;
+$EXPORT_TAGS{all} = \@EXPORT_OK; 
 
 our $VERSION = '0.01';
 
@@ -22,25 +28,93 @@ sub takeWhile (&;$) {
     }
 }
 
-sub filter (&;$) {
-    my ( $test, $list ) = @_;
-    sub {
-	my $block = $list || shift;
-	while ( defined ( local $_ = $block->() ) ) {
-	    $test->() and return $_
-	}
-	undef;
-    }
-}
-
-sub fold ($) {
-    my ( $list ) = @_;
-    my @r; 
-    while ( defined ( my $element = $list->() ) ) {
-	push @r,$element
+sub _fold {
+    my $block = shift;
+    my $next  = shift;
+    my @r;
+    while ( defined ( local $_ = $next->() ) ) {
+	$block ? $block->() : push @r,$_
     }
     @r;
 }
+sub fold   ($)   { _fold( 0, @_  ) }
+sub mapM_  (&;$) { _fold( @_     ) }
+
+sub _apply {
+    my ( $filter, $block, $list ) = @_;
+    sub {
+	my $next = $list || shift;
+	while ( defined ( local $_ = $next->() ) ) {
+	    if ( $filter ) { $block->() and return $_ }
+	    else { return $block->() }
+	}
+	return;
+    }
+}
+sub mapM   (&;$) { _apply( 0, @_ ) }
+sub filter (&;$) { _apply( 1, @_ ) }
+
+sub cycle {
+    my @cycle = @_;
+    my $index = 0;
+    sub {
+	my $r = $cycle[$index];
+	if ( ++$index > $#cycle ) { $index = 0 }
+	$r
+    };
+}
+
+sub _stepBy {
+    my $code = shift;
+    my $step = shift;
+    my @r;
+    while ( @_ ) {
+	@_ > 1 or die "odd number of arguments in pairs";
+	local $_ = [ splice @_, 0, $step ];
+	push @r, $code->();
+    }
+    @r;
+}
+
+sub stepBy (&$@) { _stepBy @_ }
+sub byPairs (&@) {
+    my $code = shift;
+    _stepBy $code, 2, @_;
+}
+
+sub prepare_sth {
+    my ( $dbh, $query,@args ) = @_;
+    my $sth = $dbh->prepare( $query );
+    $sth->execute(@args);
+    $sth;
+}
+
+sub stream_dbi {
+    my $method = shift;
+    my $sth = prepare_sth(@_);
+    sub {
+	defined ( my $cmd = shift )
+	    or return $sth->$method;
+	if ( $cmd eq 'finish' ) { undef $sth }
+    }
+}
+
+sub stream_fh {
+    open my $fh, shift or die "$!";
+    sub {
+	defined ($_ = <$fh>) or return;
+	chomp; $_;
+    }
+}
+
+# example: 
+#
+# my %author;
+# mapM_ {
+#     mapM_ { /\s\(\s*(.*?)\s+[0-9]{4}/ && $author{$1}++ }
+#     stream_fh "git blame $_|"
+# } stream_fh "git ls-files|";
+
 
 # sub lgrep (&;$) {
 #     my ( $sub, $list ) = @_;
@@ -62,7 +136,14 @@ Version 0.01
 Lazyness is an implementation of haskell functions using closures as
 parameters. 
 
-implements take, takeWhile, filter, fold
+from haskell: take, takeWhile, filter, fold, mapM
+( can closures be compared with haskell monads? )
+
+from myself : stepBy, byPairs
+( can be renamed following haskell terminology )
+
+dbi_stream and prepare_sth to create streams from dbi
+( TODO:  doc and tests )
 
     use strict;
     use warnings;

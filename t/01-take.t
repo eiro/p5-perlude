@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use Lazyness ':all';
 use Test::More 'no_plan';
-use YAML;
 
 my ( @input, $got, $expected );
 # 
@@ -17,15 +16,20 @@ my ( @input, $got, $expected );
 # my @t = qw/ toto tata aha /;
 # print "$_\n" for fold begins_with_t sub { shift @t }
 
+my $fold_ok = is
+( fold( sub { undef } )
+, 0 
+, "fold works" );
+
+unless ( $fold_ok ) {
+    diag("fold failed so every other tests will fail too");
+    exit;
+}
+
 sub test_it {
     my ( $f, $input, $expected, $desc ) = @_;
     my $got = [fold $f->( sub { shift @$input } ) ];
-    is_deeply( $got, $expected, $desc )
-	or diag YAML::Dump
-	{ got      => $got
-	, expected => $expected
-	}
-    ;
+    is_deeply( $got, $expected, $desc );
 }
 
 for my $test (
@@ -50,6 +54,7 @@ for my $test (
 
 ) { test_it @$test }
 
+
 @input = qw/ foo bar test /;
 sub eat { fold take shift, sub { shift @input } };
 
@@ -65,3 +70,15 @@ sub eat { fold take shift, sub { shift @input } };
     }
 }
 
+sub take2ones { take 2, sub { 1 } }
+
+$got = [ fold mapM { $_ + 1 } take2ones ];
+$expected = [ 2, 2 ];
+is_deeply( $got, $expected, 'mapM works');
+
+my $count = 0;
+$got = mapM_ { $count+=$_ } take2ones;
+is( $got  , 0, 'mapM_ returns nothing');
+is( $count, 2, 'mapM_ did things');
+
+# take 3, cycle 1, 2;
