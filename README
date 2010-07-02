@@ -50,3 +50,12 @@ Copyright (C) 2010 Marc Chantreux
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
+NOTES
+
+From a chat with Nicolas Pouillard:
+
+lazyness = on-demand + memoization => 
+    type Lazy a = IORef (Either (() -> a) a)
+    (can be written in perl) 
+
+Lazyness.pm is more than OCaml Steams
