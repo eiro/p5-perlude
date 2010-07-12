@@ -4,7 +4,7 @@ use strict;
 
 use parent 'Exporter';
 our %EXPORT_TAGS =
-( haskell => [qw/ take takeWhile filter fold mapM mapM_ cycle /]
+( haskell => [qw/ take takeWhile filter fold mapM mapM_ cycle drop /]
 , dbi     => [qw/ prepare_sth dbi_stream /]
 , step    => [qw/ stepBy byPairs /] 
 );
@@ -16,6 +16,14 @@ our $VERSION = '0.01';
 sub take {
     my ( $want_more, $some ) = @_;
     sub { $want_more-- > 0 ?  $some->() : undef }
+}
+
+sub drop {
+    my ( $remove, $some ) = @_; 
+    sub {
+        while ( $remove-- > 0 ) { $some->() or return }
+        $some->();
+    }   
 }
 
 sub takeWhile (&;$) {
