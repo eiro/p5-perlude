@@ -81,4 +81,25 @@ $got = mapM_ { $count+=$_ } take2ones;
 is( $got  , 0, 'mapM_ returns nothing');
 is( $count, 2, 'mapM_ did things');
 
+($got) = fold drop 2, do {
+    my @a = qw/ a b c d e f /;
+    sub { shift @a }
+};
+is( $got, 'c', 'drop works' );
+
+($got) = fold drop 2, do {
+    my @a = qw/ /;
+    sub { shift @a }
+};
+is( $got, undef, 'drop works again' );
+
+
+
+
+
+
+
+
+
+
 # take 3, cycle 1, 2;
