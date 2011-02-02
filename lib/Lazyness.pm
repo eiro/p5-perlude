@@ -36,17 +36,20 @@ sub takeWhile (&;$) {
     }
 }
 
-sub _fold {
-    my $block = shift;
-    my $next  = shift;
+sub fold ($) {
+    my ( $list ) = @_;
     my @r;
-    while ( defined ( local $_ = $next->() ) ) {
-	$block ? $block->() : push @r,$_
+    while ( defined ( local $_ = $list->() ) ) {
+	push @r,$_
     }
     @r;
 }
-sub fold   ($)   { _fold( 0, @_  ) }
-sub mapM_  (&;$) { _fold( @_     ) }
+
+sub mapM_  (&;$) {
+    my ( $code, $list ) = @_;
+    $code->() while defined ( local $_ = $list->() );
+    ();
+}
 
 sub _apply {
     my ( $filter, $block, $list ) = @_;

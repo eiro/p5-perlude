@@ -78,8 +78,8 @@ is_deeply( $got, $expected, 'mapM works');
 
 my $count = 0;
 $got = mapM_ { $count+=$_ } take2ones;
-is( $got  , 0, 'mapM_ returns nothing');
-is( $count, 2, 'mapM_ did things');
+is( $got  , undef, 'mapM_ returns nothing');
+is( $count,     2, 'mapM_ did things');
 
 ($got) = fold drop 2, do {
     my @a = qw/ a b c d e f /;
