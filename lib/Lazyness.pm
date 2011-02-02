@@ -4,9 +4,10 @@ use strict;
 
 use parent 'Exporter';
 our %EXPORT_TAGS =
-( haskell => [qw/ take takeWhile filter fold mapM mapM_ cycle drop /]
-, dbi     => [qw/ prepare_sth dbi_stream /]
-, step    => [qw/ stepBy byPairs /] 
+( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop /]
+, experimental => [qw/ range /]
+, dbi          => [qw/ prepare_sth dbi_stream /]
+, step         => [qw/ stepBy byPairs /] 
 );
 our @EXPORT_OK = map {@$_} values %EXPORT_TAGS;
 $EXPORT_TAGS{all} = \@EXPORT_OK; 
@@ -73,6 +74,19 @@ sub cycle {
 	if ( ++$index > $#cycle ) { $index = 0 }
 	$r
     };
+}
+
+sub range {
+    my ( $min, $max, $step ) = @_;
+    defined $max or die "range without max";
+    $step ||= 1;
+    sub {
+	my $r = $min;
+	if ( $max >= $r ) {
+	    $min+=$step;
+	    $r;
+	} else { undef }
+    }
 }
 
 sub _stepBy {
