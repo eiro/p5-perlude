@@ -4,7 +4,7 @@ use strict;
 
 use parent 'Exporter';
 our %EXPORT_TAGS =
-( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat /]
+( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat unfold /]
 , experimental => [qw/ range /]
 , dbi          => [qw/ prepare_sth dbi_stream /]
 , step         => [qw/ stepBy byPairs /] 

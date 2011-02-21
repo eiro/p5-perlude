@@ -10,7 +10,3 @@ my $got;
 $got = [fold unfold [@$expected] ];
 is_deeply( $got, $expected, "unfold . fold => id")
     or diag YAML::Dump { got => $got };
-
-$got = [fold concat [ map { unfold [$_] } @$expected ]];
-is_deeply( $got, $expected, "contact works with clean input")
-    or diag YAML::Dump { got => $got };
