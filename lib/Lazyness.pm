@@ -4,7 +4,7 @@ use strict;
 
 use parent 'Exporter';
 our %EXPORT_TAGS =
-( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop /]
+( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat /]
 , experimental => [qw/ range /]
 , dbi          => [qw/ prepare_sth dbi_stream /]
 , step         => [qw/ stepBy byPairs /] 
@@ -86,6 +86,24 @@ sub range {
 	    $min+=$step;
 	    $r;
 	} else { undef }
+    }
+}
+
+sub unfold {
+    my $array = shift;
+    sub { shift @$array }
+}
+
+sub concat {
+    my $streams = shift or return sub { undef };
+    sub {
+	while ( @$streams ) {
+	    my $r;
+	    defined ( $r = $$streams[0]() )
+		and return $r;
+	    shift @$streams;
+	}
+	return
     }
 }
 
