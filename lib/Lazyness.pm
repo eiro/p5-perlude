@@ -4,7 +4,7 @@ use strict;
 
 use parent 'Exporter';
 our %EXPORT_TAGS =
-( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat unfold /]
+( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat concatM concatMap unfold /]
 , experimental => [qw/ range /]
 , dbi          => [qw/ prepare_sth dbi_stream /]
 , step         => [qw/ stepBy byPairs /] 
@@ -63,8 +63,37 @@ sub _apply {
 	return;
     }
 }
-sub mapM   (&;$) { _apply( 0, @_ ) }
-sub filter (&;$) { _apply( 1, @_ ) }
+
+sub concat {
+    my $streams = shift or return sub { undef };
+    sub {
+	while ( @$streams ) {
+	    my $r;
+	    defined ( $r = $$streams[0]() )
+		and return $r;
+	    shift @$streams;
+	}
+	return
+    }
+}
+
+sub concatM {
+    my $streams  = shift or return sub { undef };
+    my $s        = $streams->();
+    my $running = 1;
+    sub {
+	my $r;
+	while ($running) {
+	    defined ( $r = $s->() ) and return $r;
+	    defined ( $s = $streams->() ) or $running = 0;
+	}
+	undef;
+    }
+}
+
+sub mapM        (&;$) { _apply( 0, @_ )         }
+sub concatMap   (&;$) { concatM _apply( 0, @_ ) }
+sub filter      (&;$) { _apply( 1, @_ )         }
 
 sub cycle {
     my @cycle = @_;
@@ -94,18 +123,6 @@ sub unfold {
     sub { shift @$array }
 }
 
-sub concat {
-    my $streams = shift or return sub { undef };
-    sub {
-	while ( @$streams ) {
-	    my $r;
-	    defined ( $r = $$streams[0]() )
-		and return $r;
-	    shift @$streams;
-	}
-	return
-    }
-}
 
 sub _stepBy {
     my $code = shift;
