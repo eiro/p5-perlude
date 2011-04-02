@@ -1,11 +1,12 @@
 package Lazyness;
 use warnings;
 use strict;
+use 5.10.0;
 
 use parent 'Exporter';
 our %EXPORT_TAGS =
-( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat concatM concatMap unfold /]
-, experimental => [qw/ range /]
+( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat concatM concatMap unfold collectM sumM productM /]
+, experimental => [qw/ range  /]
 , dbi          => [qw/ prepare_sth dbi_stream /]
 , step         => [qw/ stepBy byPairs /] 
 );
@@ -166,6 +167,16 @@ sub stream_fh {
 	chomp; $_;
     }
 }
+
+sub collectM (&$) {
+    my ( $code, $stream ) = @_;
+    my $r;
+    while ( defined ( local $_ = $stream->() )) { $r = $code->() }
+    $r;
+}
+
+sub sumM     { collectM { state $sum = 0; $sum+=$_ } shift }
+sub productM { collectM { state $sum = 1; $sum*=$_ } shift }
 
 # example: 
 #
