@@ -178,6 +178,9 @@ sub collectM (&$) {
 sub sumM     { collectM { state $sum = 0; $sum+=$_ } shift }
 sub productM { collectM { state $sum = 1; $sum*=$_ } shift }
 
+sub printM { mapM { ref ? say @$_   : say }   }
+sub sayM { mapM { ref ? print @$_ : print } }
+
 # example: 
 #
 # my %author;
