@@ -6,9 +6,10 @@ use 5.10.0;
 use parent 'Exporter';
 our %EXPORT_TAGS =
 ( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat concatM concatMap unfold collectM sumM productM /]
-, experimental => [qw/ range  /]
-, dbi          => [qw/ prepare_sth dbi_stream /]
-, step         => [qw/ stepBy byPairs /] 
+, experimental => [qw/ range                   /]
+, perl         => [qw/ sayM perlM sayM_ perlM_ /]
+, dbi          => [qw/ prepare_sth dbi_stream  /]
+, step         => [qw/ stepBy byPairs          /] 
 );
 our @EXPORT_OK = map {@$_} values %EXPORT_TAGS;
 $EXPORT_TAGS{all} = \@EXPORT_OK; 
@@ -178,8 +179,10 @@ sub collectM (&$) {
 sub sumM     { collectM { state $sum = 0; $sum+=$_ } shift }
 sub productM { collectM { state $sum = 1; $sum*=$_ } shift }
 
-sub printM { mapM { ref ? say @$_   : say }   }
-sub sayM { mapM { ref ? print @$_ : print } }
+sub printM_ ($) { mapM_ { ref $_ ? print @$_   : print  ; $_ } shift }
+sub sayM_   ($) { mapM_ { ref $_ ? say   @$_   : say    ; $_ } shift }
+sub printM  ($) { mapM  { ref $_ ? print @$_   : print       } shift }
+sub sayM    ($) { mapM  { ref $_ ? say   @$_   : say         } shift }
 
 # example: 
 #
