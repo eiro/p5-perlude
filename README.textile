@@ -1,21 +1,21 @@
 h1. Motivation
 
-Even with a decent perl skillset, i stuck to shell scripting to solve many
-problems and dreamed to use a linux version of powershell since many years.
-The reason is perl has no pipe.
+Even with a decent perl skillset, I stuck to shell scripting to solve many
+problems and dreamed to use a Linux version of PowerShell for many years.
+The reason is Perl has no pipe operator.
 
-Writting and reading haskell programs, i figured out the 3 features which makes pipe a magic operator:
+Reading and writing Haskell programs, I figured out the 3 features which makes pipe a magic operator:
 
-* it's on demand so you write generators without taking carre about end conditions, you write filters with no assomptions on the size of the stream and you get programs that keeps low memory profiles whatever the size of the data sources.
+* it's on demand so you write generators without worrying about end conditions, you write filters with no assumptions on the size of the stream and you get programs that keeps low memory profiles whatever the size of the data sources.
 * it's implicit: you know you are handling the current record so you don't have to pass it as argument
 * it's chainable so you easily compose new generators and filters
-* plus: powershell can pass objects as records so you don't have to parse and serialize every time anymore
+* plus: PowerShell can pass objects as records so you don't have to parse and serialize every time anymore
 
-Perl have the ability to write generators a very powerfull and simple way. 
-Perl have implicity via $_. 
+Perl has the ability to write generators in a very powerful and simple way. 
+Perl has implicity via $_. 
 The only missing part is the filtering toolchain, that's where Perlude came in.
 
-take a look on this problem: what is the 10 first elements of the fibonnaci suite that is a multiple of five. First we need a fibonnaci generator. easy in perl: 
+Take a look at this problem: what is the 10 first elements of the Fibonnaci suite that is a multiple of five. First we need a fibonnaci generator. Easy in perl: 
 
     sub fibonnaci {
 	my @seed = @_;
@@ -42,7 +42,7 @@ this isn't good! i really would like to write something like:
 
     say for ( grep { $_ % 5 == 0 } @{infinite_array_from_fibonnaci } )[10]
 
-But you can't. On the other way, that's why Perlude stolen keywords from haskell prelude. You can write: 
+But you can't. On the other way, that's why Perlude stole keywords from Haskell Prelude. You can write: 
 
     mapM_ {say} take 10, filter { $_ % 5 == 0 } fibonnaci 1,1;
     mapC_ {say} takeC 10, grepC { $_ % 5 == 0 } fibonnaci 1,1;
@@ -69,4 +69,4 @@ Imagine you want to print a file
 
 h1. Todo
 
-There are now keywords that doesn't exists in haskell world 
+There are now keywords that do not exist in the Haskell world 
