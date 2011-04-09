@@ -6,8 +6,8 @@ use Test::More tests => 1;
 
 my $got = [
     fold concatMap {
-	my @r = ($_)x2;
-	sub { shift @r }
+        my @r = ($_)x2;
+        sub { shift @r }
     } unfold [1..3]
 ];
 

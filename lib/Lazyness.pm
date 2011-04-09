@@ -32,19 +32,17 @@ sub drop {
 sub takeWhile (&;$) {
     my ( $test, $list ) = @_;
     sub {
-	my $block = $list || shift;
-	local $_ = $block->();
-	defined or return undef;
-	$test->() ? $_ : undef;
+        my $block = $list || shift;
+        local $_ = $block->();
+        defined or return undef;
+        $test->() ? $_ : undef;
     }
 }
 
 sub fold ($) {
     my ( $list ) = @_;
     my @r;
-    while ( defined ( local $_ = $list->() ) ) {
-	push @r,$_
-    }
+    while ( defined ( local $_ = $list->() ) ) { push @r,$_ }
     @r;
 }
 
@@ -57,25 +55,24 @@ sub mapM_  (&;$) {
 sub _apply {
     my ( $filter, $block, $list ) = @_;
     sub {
-	my $next = $list || shift;
-	while ( defined ( local $_ = $next->() ) ) {
-	    if ( $filter ) { $block->() and return $_ }
-	    else { return $block->() }
-	}
-	return;
+        my $next = $list || shift;
+        while ( defined ( local $_ = $next->() ) ) {
+            if ( $filter ) { $block->() and return $_ }
+            else { return $block->() }
+        }
+        return;
     }
 }
 
 sub concat {
     my $streams = shift or return sub { undef };
     sub {
-	while ( @$streams ) {
-	    my $r;
-	    defined ( $r = $$streams[0]() )
-		and return $r;
-	    shift @$streams;
-	}
-	return
+        while ( @$streams ) {
+            my $r;
+            defined ( $r = $$streams[0]() ) and return $r;
+            shift @$streams;
+        }
+        return
     }
 }
 
@@ -84,12 +81,12 @@ sub concatM {
     my $s        = $streams->();
     my $running = 1;
     sub {
-	my $r;
-	while ($running) {
-	    defined ( $r = $s->() ) and return $r;
-	    defined ( $s = $streams->() ) or $running = 0;
-	}
-	undef;
+        my $r;
+        while ($running) {
+            defined ( $r = $s->() ) and return $r;
+            defined ( $s = $streams->() ) or $running = 0;
+        }
+        undef;
     }
 }
 
@@ -101,9 +98,9 @@ sub cycle {
     my $cycle = shift;
     my $index = 0;
     sub {
-	my $r = $$cycle[$index];
-	if ( ++$index > $#$cycle ) { $index = 0 }
-	$r
+        my $r = $$cycle[$index];
+        if ( ++$index > $#$cycle ) { $index = 0 }
+        $r
     };
 }
 
@@ -112,11 +109,11 @@ sub range {
     defined $max or die "range without max";
     $step ||= 1;
     sub {
-	my $r = $min;
-	if ( $max >= $r ) {
-	    $min+=$step;
-	    $r;
-	} else { undef }
+        my $r = $min;
+        if ( $max >= $r ) {
+            $min+=$step;
+            $r;
+        } else { undef }
     }
 }
 
@@ -131,9 +128,9 @@ sub _stepBy {
     my $step = shift;
     my @r;
     while ( @_ ) {
-	@_ > 1 or die "odd number of arguments in pairs";
-	local $_ = [ splice @_, 0, $step ];
-	push @r, $code->();
+        @_ > 1 or die "odd number of arguments in pairs";
+        local $_ = [ splice @_, 0, $step ];
+        push @r, $code->();
     }
     @r;
 }
@@ -155,17 +152,17 @@ sub stream_dbi {
     my $method = shift;
     my $sth = prepare_sth(@_);
     sub {
-	defined ( my $cmd = shift )
-	    or return $sth->$method;
-	if ( $cmd eq 'finish' ) { undef $sth }
+        defined ( my $cmd = shift )
+            or return $sth->$method;
+        if ( $cmd eq 'finish' ) { undef $sth }
     }
 }
 
 sub stream_fh {
     open my $fh, shift or die "$!";
     sub {
-	defined ($_ = <$fh>) or return;
-	chomp; $_;
+        defined ($_ = <$fh>) or return;
+        chomp; $_;
     }
 }
 
@@ -228,24 +225,24 @@ dbi_stream and prepare_sth to create streams from dbi
 
     say for fold take 10, sub { 1 }
     say for fold
-	takeWhile { $_ < 300 }
-	do { my $x = 6; sub { $x*= 6 } }
+    takeWhile { $_ < 300 }
+    do { my $x = 6; sub { $x*= 6 } }
 
     my $pow6 = 
-	takeWhile { $_ < 300 }
-	do { my $x = 6; sub { $x*= 6 } }
+    takeWhile { $_ < 300 }
+    do { my $x = 6; sub { $x*= 6 } }
     ;
     while ( my $x = &$pow6 ) { say $x }
 
     # all numbers from $x to infinity
     sub to_infinity_from {
-	my $start = shift;
-	sub { $start++ }
+    my $start = shift;
+    sub { $start++ }
     }
 
     # all evens from 1 to infinity
     sub list_of_positive_evens {
-	filter { not ( $_ % 2  ) } to_infinity_from(1);
+    filter { not ( $_ % 2  ) } to_infinity_from(1);
     }
 
     # prints the 10 first evens
@@ -272,15 +269,15 @@ So in the real world, you can write
     use Text::CSV;
 
     ( my $csv_parser = Text::CSV->new({ qw/ binary 1 sep_char : / })
-	    or die Text::CSV->error_diag
+        or die Text::CSV->error_diag
     )->column_names(qw/ login passwd uid gid gecos home shell /);
     # root:x:0:0:root:/root:/bin/bash
 
     open my $passwd_entries,'getent passwd |' or die $!;
 
     sub is_user {
-	has_primary_group( sub { $_ > 1000 })
-	&& $$_{login} ne 'nobody'
+    has_primary_group( sub { $_ > 1000 })
+    && $$_{login} ne 'nobody'
     }
 
     # has_primary_group [0,1000]
@@ -292,7 +289,7 @@ So in the real world, you can write
 
     say join ' = ', @$_{qw/login uid gid /}
     for fold all_bofh_friends
-	{ $csv_parser->getline_hr( $passwd_entries ) }
+    { $csv_parser->getline_hr( $passwd_entries ) }
 
 =head1 EXPORT
 

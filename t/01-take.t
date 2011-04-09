@@ -65,8 +65,8 @@ sub eat { fold take shift, sub { shift @input } };
     , [ [qw/ test /]    , [eat 10] ]
     , [ []              , [eat 10] ]
     ) { my ( $expected, $got ) = @$takes;
-	is_deeply ( $got, $expected , "take test $take_test ok" );
-	$take_test++;
+        is_deeply ( $got, $expected , "take test $take_test ok" );
+        $take_test++;
     }
 }
 
