@@ -98,11 +98,11 @@ sub concatMap   (&;$) { concatM _apply( 0, @_ ) }
 sub filter      (&;$) { _apply( 1, @_ )         }
 
 sub cycle {
-    my @cycle = @_;
+    my $cycle = shift;
     my $index = 0;
     sub {
-	my $r = $cycle[$index];
-	if ( ++$index > $#cycle ) { $index = 0 }
+	my $r = $$cycle[$index];
+	if ( ++$index > $#$cycle ) { $index = 0 }
 	$r
     };
 }
