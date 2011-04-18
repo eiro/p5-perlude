@@ -1,0 +1,114 @@
+A. Naming conventions 
+
+Lazyness.pm is and a linkfluence corworker found a good name for it: 
+Perlude (haskell prelude alike in perl). Plus, some people asked me if/when the
+module will be available on CPAN. I think it's time to release a version 1.
+
+Before doing so, i have to make my mind up on the keywords and that's hard for me.
+
+I used haskell keywords because i thought there was no reason to invent a namespace
+stealing another one but: 
+
+* now i have a lot of functions using M notation. M means monad, and closures are not
+  monads. 
+* some steals really doesn't work. lines <$> openFile can be translated by lines
+  IO::File->new but it's not the same approach.
+* i had to add keywords that are useless in haskell as long as they have lists when perl
+  only have arrays.
+
+In the other hand, M and _ suffixes are good ideas i can keep just replacing M by C. it
+also works with the stream conterparts of perl builtin for arrays.
+
+So that's my current idea
+
+  current (haskell) | perl @        | Perlude
+  ------------------+---------------+----------
+  mapM              | map           | mapC 
+  mapM_             | ~ for         | forC, mapC_
+  filter            | grep          | grepC 
+  fold              | ...           | foldC ? so unfold is ? 
+
+so the previous 
+
+mapM_ { say } filter { /mc/ } openFile "getent passwd|";
+
+becomes 
+
+forC { say } grepC { /mc/ } openFile "getent passwd|";
+
+B. What function must be in Perlude ?
+
+unfold       [V]         -> C 
+fold         C           -> [V] 
+concat       [C]         -> C
+concatC      (C -> C)    -> C
+takeC        Int,C       -> C 
+forC         C           -> ()
+mapC         Block,C     -> C
+grepC        Block,C     -> C
+collectC     Block,C     -> C (sumC, productC, ... ) 
+openFile     path        -> C
+openFileC    (C -> path) -> C 
+openDir      path        -> C
+openDirC     (C -> path )-> C
+grepDir      path        -> C
+openFileC    (C -> path) -> C 
+
+cart (cartesian product is generator ... Have a namespace for generators ?)
+
+C. Other questions
+
+what about openFile and lines ?
+
+    lines      fh   ->  C 
+    openFile   path -> 
+    openFileC  C    -> 
+
+D. a better find/glob ??? 
+
+we need a 'on demand' version of glob. so is it possible to have a better syntax. 
+a lazy version of glob ... with better syntax ?
+
+    * use RE, not globs 
+    * use marks
+    * split with /, // (recursive), /[zsh_glob_modifiers]
+
+using regex marks when they exists, when can have syntaxes like:
+
+    '//[^l0] (*rapport)
+            ^ (?<base>.*) [.] (?<ext>[^.]+) $ 
+    '
+
+search recursively non empty csv files. so the file: 
+
+    /rapports/2010/12/faces.csv
+
+returns:
+
+    { dirname  => [qw{ rapports 2010 12 }] 
+    , basename => 'faces.csv'
+    , mark     => 'rapport'
+    , matches  => {qw/ base faces ext csv /}
+    }
+
+E.  setup a site ?
+
+examples/* in a cpan distrib isn't enought to spread Perlude: what about a
+website to expose them? with a project euler solutions page. 
+
+F. Something to revert the callback mechanism
+
+how to provide a generic syntax to use Anyevent driven streams or "callback to
+closures" (for example: Net::LDAP callback to treat entries onfly)
+
+G. provide streamers for common sources
+
+CSV, LDAP, DBI,  ...
+
+Could be easy to stream anything with a 
+
+    sub Stream {
+        my ( $self, $method, @args ) = @_;
+        sub { $self->$method(@args) }
+    }
+
