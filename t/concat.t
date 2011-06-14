@@ -1,7 +1,6 @@
 #! /usr/bin/perl
-use Modern::Perl;
 use YAML;
-use Lazyness ':all';
+use Perlude;
 use Test::More tests => 1;
 
 my $expected = [1..100];

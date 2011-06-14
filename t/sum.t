@@ -1,13 +1,11 @@
 #! /usr/bin/perl
-use Modern::Perl;
-use YAML;
-use Lazyness ':all';
+use Perlude;
 use Test::More tests => 1;
 
 is
-( (sumM range(1, 3))
+( (sumR range(1, 3))
 , 6 
-, "sumM works, so collectM" 
+, "sumR works, so collectR" 
 )
 
 __END__

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use 5.10.0;
-use Lazyness qw/ fold range /;
+use Perlude qw/ fold range /;
 use Test::More tests => 3;
 
 sub fold_for {

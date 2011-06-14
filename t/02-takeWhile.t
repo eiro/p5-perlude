@@ -1,13 +1,11 @@
 #! /usr/bin/perl
 use strict;
 use warnings;
-use Lazyness ':all';
+use Perlude;
 use Test::More skip_all => "takeWhile can't be fixed";
 
 my ( @input, $got, $expected );
 
-
-use YAML;
 my $doubles = do { 
     my $seed = 0;
     sub { $seed+=2 } 

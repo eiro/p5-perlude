@@ -1,20 +1,25 @@
-package Lazyness;
+package Perlude;
 use warnings;
 use strict;
 use 5.10.0;
+use Carp;
 
 use parent 'Exporter';
-our %EXPORT_TAGS =
-( haskell      => [qw/ take takeWhile filter fold mapM mapM_ cycle drop concat concatM concatMap unfold collectM sumM productM /]
-, experimental => [qw/ range                   /]
-, perl         => [qw/ sayM perlM sayM_ perlM_ /]
-, dbi          => [qw/ prepare_sth dbi_stream  /]
-, step         => [qw/ stepBy byPairs          /] 
-);
-our @EXPORT_OK = map {@$_} values %EXPORT_TAGS;
-$EXPORT_TAGS{all} = \@EXPORT_OK; 
+our @EXPORT = qw/
+    drop take takeWhile
+    fold unfold
+    filter mapC mapR 
+    cycle range
+    concat concatC concatMap
+    collectR sumR productR
+/;
 
-our $VERSION = '0.01';
+# TODO:
+# - UTs for records, lines, stream
+# - Documentations and examples
+# - examples
+
+our $VERSION = '0.42';
 
 sub take {
     my ( $want_more, $some ) = @_;
@@ -46,7 +51,7 @@ sub fold ($) {
     @r;
 }
 
-sub mapM_  (&;$) {
+sub mapR  (&;$) {
     my ( $code, $list ) = @_;
     $code->() while defined ( local $_ = $list->() );
     ();
@@ -76,7 +81,7 @@ sub concat {
     }
 }
 
-sub concatM {
+sub concatC {
     my $streams  = shift or return sub { undef };
     my $s        = $streams->();
     my $running = 1;
@@ -90,9 +95,9 @@ sub concatM {
     }
 }
 
-sub mapM        (&;$) { _apply( 0, @_ )         }
-sub concatMap   (&;$) { concatM _apply( 0, @_ ) }
-sub filter      (&;$) { _apply( 1, @_ )         }
+sub mapC        (&;$) {         _apply ( 0, @_ ) }
+sub concatMap   (&;$) { concatC _apply ( 0, @_ ) }
+sub filter      (&;$) { _apply         ( 1, @_ ) }
 
 sub cycle {
     my $cycle = shift;
@@ -122,82 +127,48 @@ sub unfold {
     sub { shift @$array }
 }
 
-
-sub _stepBy {
-    my $code = shift;
-    my $step = shift;
-    my @r;
-    while ( @_ ) {
-        @_ > 1 or die "odd number of arguments in pairs";
-        local $_ = [ splice @_, 0, $step ];
-        push @r, $code->();
-    }
-    @r;
-}
-
-sub stepBy (&$@) { _stepBy @_ }
-sub byPairs (&@) {
-    my $code = shift;
-    _stepBy $code, 2, @_;
-}
-
-sub prepare_sth {
-    my ( $dbh, $query,@args ) = @_;
-    my $sth = $dbh->prepare( $query );
-    $sth->execute(@args);
-    $sth;
-}
-
-sub stream_dbi {
-    my $method = shift;
-    my $sth = prepare_sth(@_);
-    sub {
-        defined ( my $cmd = shift )
-            or return $sth->$method;
-        if ( $cmd eq 'finish' ) { undef $sth }
-    }
-}
-
-sub stream_fh {
-    open my $fh, shift or die "$!";
-    sub {
-        defined ($_ = <$fh>) or return;
-        chomp; $_;
-    }
-}
-
-sub collectM (&$) {
+sub collectR (&$) {
     my ( $code, $stream ) = @_;
     my $r;
     while ( defined ( local $_ = $stream->() )) { $r = $code->() }
     $r;
 }
 
-sub sumM     { collectM { state $sum = 0; $sum+=$_ } shift }
-sub productM { collectM { state $sum = 1; $sum*=$_ } shift }
+sub sumR     { collectR { state $sum = 0; $sum+=$_ } shift }
+sub productR { collectR { state $sum = 1; $sum*=$_ } shift }
 
-sub printM_ ($) { mapM_ { ref $_ ? print @$_   : print  ; $_ } shift }
-sub sayM_   ($) { mapM_ { ref $_ ? say   @$_   : say    ; $_ } shift }
-sub printM  ($) { mapM  { ref $_ ? print @$_   : print       } shift }
-sub sayM    ($) { mapM  { ref $_ ? say   @$_   : say         } shift }
+sub records {
+    my ($source) = @_;
+    sub { <$source> }
+}
 
-# example: 
-#
-# my %author;
-# mapM_ {
-#     mapM_ { /\s\(\s*(.*?)\s+[0-9]{4}/ && $author{$1}++ }
-#     stream_fh "git blame $_|"
-# } stream_fh "git ls-files|";
+sub lines {
+    open my $fh,shift;
+    if ($@) {
+	if ($_[0] ~~ 'chomp') {
+	    sub {
+		my $v = <$fh>;
+		chomp $v;
+		$v
+	    }
+	} else {
+	    croak 'your arguments iz invalid:'
+	    , join ',', @_
+	}
+    }
+    else { records $fh }
+}
 
-
-# sub lgrep (&;$) {
-#     my ( $sub, $list ) = @_;
-#     fold filter $sub, $list;
-# }
+sub stream {
+    my $source = shift;
+    my $method = shift;
+    my @args   = @_;
+    sub { $source->$method(@args) }
+}
 
 =head1 NAME
 
-Lazyness - a taste of haskell in perl
+Perlude - a prelude for perl
 
 =head1 VERSION
 
@@ -207,124 +178,80 @@ Version 0.01
 
 =head1 SYNOPSIS
 
-Lazyness is an implementation of haskell functions using closures as
-parameters. 
+Perlude functions are filters and consumers for generators (Closures). It
+adds keywords stolen from the haskell world and introduce some perl specific
+ones.
 
-from haskell: take, takeWhile, filter, fold, mapM
-( can closures be compared with haskell monads? )
+=head1 Rules, naming and conventions
 
-from myself : stepBy, byPairs
-( can be renamed following haskell terminology )
+A generator is a closure
 
-dbi_stream and prepare_sth to create streams from dbi
-( TODO:  doc and tests )
+* a scalar as a next element
 
-    use strict;
-    use warnings;
-    use Lazyness ':all';
+* undef when exhausted
 
-    say for fold take 10, sub { 1 }
-    say for fold
-    takeWhile { $_ < 300 }
-    do { my $x = 6; sub { $x*= 6 } }
+The list of every potential elements of a generator is called "the stream".
 
-    my $pow6 = 
-    takeWhile { $_ < 300 }
-    do { my $x = 6; sub { $x*= 6 } }
-    ;
-    while ( my $x = &$pow6 ) { say $x }
+sub that takes and returns a closures is a filter, its name is postfixed with a C (mapC, ...).
 
-    # all numbers from $x to infinity
-    sub to_infinity_from {
-    my $start = shift;
-    sub { $start++ }
-    }
+sub that takes a closure and consume (read) it is a Reader, its name is prefixed with a R (mapR,reduceR,sumR,productR, ...)
 
-    # all evens from 1 to infinity
-    sub list_of_positive_evens {
-    filter { not ( $_ % 2  ) } to_infinity_from(1);
-    }
+keywords stolen from haskell are exceptions to the naming convention (filter,fold,unfold,...)
 
-    # prints the 10 first evens
-    my $list = take 10, list_of_positive_evens;
-    while ( my $x = &$list ) { say $x }
+from haskell: take, takeWhile, filter, fold, (unfold?) concat ...
 
-    # also prints the 10 first evens
-    sub first_positive_evens { fold take shift, list_of_positive_evens }
-    say for first_positive_evens(10);
+=head2 Notes for haskell users
 
-    # also prints the 10 first evens
-    sub top_10 { fold take 10, shift }
-    say for top_10 list_of_positive_evens;
+As perl doesn't have monads, M and M_ functions are replaced by C (for Closure)
+and R (for Reader). so 
 
-    # also all evens under 20
-    sub under_20 { fold takeWhile { $_ < 20} shift }
-    say for under_20 list_of_positive_evens;
+    mapM_ print    => mapR {say}
+    mapM  print    => mapC {say}
+    map (* 2)      => mapC { $_ * 2 }
 
-So in the real world, you can write
-
-    #! /usr/bin/perl
-    use 5.10.0;
-    use Lazyness ':all';
-    use Text::CSV;
-
-    ( my $csv_parser = Text::CSV->new({ qw/ binary 1 sep_char : / })
-        or die Text::CSV->error_diag
-    )->column_names(qw/ login passwd uid gid gecos home shell /);
-    # root:x:0:0:root:/root:/bin/bash
-
-    open my $passwd_entries,'getent passwd |' or die $!;
-
-    sub is_user {
-    has_primary_group( sub { $_ > 1000 })
-    && $$_{login} ne 'nobody'
-    }
-
-    # has_primary_group [0,1000]
-    # has_primary_group 100
-    # has_primary_group ( sub { $_ > 1000 } )
-    sub has_primary_group  { shift ~~ $$_{gid} }
-
-    sub all_bofh_friends (&) { filter { is_user } shift }
-
-    say join ' = ', @$_{qw/login uid gid /}
-    for fold all_bofh_friends
-    { $csv_parser->getline_hr( $passwd_entries ) }
 
 =head1 EXPORT
 
 =head1 FUNCTIONS
 
-=head2 take $n, $closures
+=head2 take $n, $C
 
-takes $n elements to the closure
+take $n elements from $C
 
-=cut
+    fold take 10, sub { state $x=0; $x++ }
+    #  => 0..9
 
-=head2 takeWhile $test, $closures
+=head2 takeWhile $test, $C
 
-takes elements of the closure while test is true 
+take all the first elements from the closure that matches $test.
 
-=cut
+    fold takeWhile { $_ < 100 } fibonacci
+    # returns every terms of the fibonacci sequence under 100
 
+=head2 filter $test, $C
 
-=head2 filter $test, $closures
+remove any elements that matches $test from the steam (as grep does with arrays)
 
-takes all elements of the closure that matches the $test
+    filter { /3/ } fibonacci
 
-=cut
+removes every terms of fibonacci sequence that contains the digit 3 
 
-=head2 fold $closure
+=head2 fold $C
 
-transform a closure to an array
+fold every terms of the steam into an array
 
-=cut
+    my @c4 = fold  take 50 filter {/4/} nat;
 
-=head2 lgrep (does't work)
+@c4 is the array of the first 50 naturals that contains the 4 digit
 
-shortcut for fold filter 
+=head2 unfold $array_ref
 
-=cut
+stream the array elements
+
+    mapR {say if /5/ } unfold [1..5];
+    is like
+    map {say if /5/} 1..5;
+
 
 =head1 AUTHOR
 
@@ -341,7 +268,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Lazyness
+    perldoc Perlude
 
 
 You can also look for information at:

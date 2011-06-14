@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 use strict;
 use warnings;
-use Lazyness ':all';
+use Perlude;
 use Test::More 'no_plan';
 
 my ( @input, $got, $expected );
@@ -72,14 +72,14 @@ sub eat { fold take shift, sub { shift @input } };
 
 sub take2ones { take 2, sub { 1 } }
 
-$got = [ fold mapM { $_ + 1 } take2ones ];
+$got = [ fold mapC { $_ + 1 } take2ones ];
 $expected = [ 2, 2 ];
-is_deeply( $got, $expected, 'mapM works');
+is_deeply( $got, $expected, 'mapC works');
 
 my $count = 0;
-$got = mapM_ { $count+=$_ } take2ones;
-is( $got  , undef, 'mapM_ returns nothing');
-is( $count,     2, 'mapM_ did things');
+$got = mapR { $count+=$_ } take2ones;
+is( $got  , undef, 'mapR returns nothing');
+is( $count,     2, 'mapR did things');
 
 ($got) = fold drop 2, do {
     my @a = qw/ a b c d e f /;
