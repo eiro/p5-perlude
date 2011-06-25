@@ -8,10 +8,11 @@ use parent 'Exporter';
 our @EXPORT = qw/
     drop take takeWhile
     fold unfold
-    filter mapC mapR 
+    filter apply reduce
     cycle range
     concat concatC concatMap
-    collectR sumR productR
+    sum product
+    lines
 /;
 
 # TODO:
@@ -47,15 +48,18 @@ sub takeWhile (&;$) {
 sub fold ($) {
     my ( $list ) = @_;
     my @r;
-    while ( defined ( local $_ = $list->() ) ) { push @r,$_ }
+    while ( defined ( my $v= $list->() ) ) { push @r,$v }
     @r;
 }
 
-sub mapR  (&;$) {
+sub reduce  (&;$) {
     my ( $code, $list ) = @_;
-    $code->() while defined ( local $_ = $list->() );
-    ();
+    my $r;
+    $r = $code->() while defined ( local $_ = $list->() );
+    $r;
 }
+sub sum     { reduce { state $sum = 0; $sum+=$_ } shift }
+sub product { reduce { state $sum = 1; $sum*=$_ } shift }
 
 sub _apply {
     my ( $filter, $block, $list ) = @_;
@@ -95,7 +99,7 @@ sub concatC {
     }
 }
 
-sub mapC        (&;$) {         _apply ( 0, @_ ) }
+sub apply       (&;$) {         _apply ( 0, @_ ) }
 sub concatMap   (&;$) { concatC _apply ( 0, @_ ) }
 sub filter      (&;$) { _apply         ( 1, @_ ) }
 
@@ -126,16 +130,6 @@ sub unfold {
     my $array = shift;
     sub { shift @$array }
 }
-
-sub collectR (&$) {
-    my ( $code, $stream ) = @_;
-    my $r;
-    while ( defined ( local $_ = $stream->() )) { $r = $code->() }
-    $r;
-}
-
-sub sumR     { collectR { state $sum = 0; $sum+=$_ } shift }
-sub productR { collectR { state $sum = 1; $sum*=$_ } shift }
 
 sub records {
     my ($source) = @_;
