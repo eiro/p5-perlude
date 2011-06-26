@@ -8,7 +8,7 @@ use parent 'Exporter';
 our @EXPORT = qw/
     drop take takeWhile
     fold unfold
-    filter apply reduce
+    filter apply funnel
     cycle range
     concat concatC concatMap
     sum product
@@ -52,14 +52,15 @@ sub fold ($) {
     @r;
 }
 
-sub reduce  (&;$) {
+sub funnel (&;$) {
     my ( $code, $list ) = @_;
     my $r;
     $r = $code->() while defined ( local $_ = $list->() );
     $r;
 }
-sub sum     { reduce { state $sum = 0; $sum+=$_ } shift }
-sub product { reduce { state $sum = 1; $sum*=$_ } shift }
+
+sub sum     { my $sum=0;  funnel { $sum+=$_  } shift }
+sub product { my $prod=1; funnel { $prod*=$_ } shift }
 
 sub _apply {
     my ( $filter, $block, $list ) = @_;
