@@ -22,7 +22,15 @@ my @take =
 );
 
 my @drop =
-();
+( [ 2,  [1..30], [3..30] ]
+, [ 2,  [0,1], []  ]
+, [ 2,  [0,1,2], [2] ]
+, [ 3,  [], []        ]
+, [ 3,  [1], []      ]
+, [ 3,  [undef,2], []      ]
+, [ 0,  [undef,2], [undef,2]      ]
+, [ -1, [undef,2], [undef,2]      ]
+);
 
 plan tests
 => @takeWhile
@@ -49,10 +57,11 @@ for my $t (@take) {
     )
 }
 
-# for my $t (@tests) {
-#     is_deeply
-#     ( [fold unfold @$t]
-#     , $t
-#     , "fold unfold => id"
-#     )
-# }
+for my $t (@drop) {
+    my ( $n, $in, $out ) = @$t;
+    is_deeply
+    ( [fold drop $n, unfold @$in ]
+    , $out
+    , "drop"
+    )
+}

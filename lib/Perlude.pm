@@ -7,6 +7,7 @@ our @EXPORT = qw<
     takeWhile take drop
     filter apply
     funnel
+    cycle
 
 >; 
 
@@ -42,12 +43,15 @@ sub filter (&$) {
 
 sub take ($$) {
     my ( $n, $i ) = @_;
-    takeWhile { $n-- > 0 } $i;
+    sub {
+	$n-- > 0 or return;
+	$i->()
+    }
 }
 
 sub drop ($$) {
     my ( $n, $i ) = @_;
-    take $n, $i;
+    fold take $n, $i;
     $i;
 }
 
@@ -59,7 +63,7 @@ sub apply (&$) {
     }
 }
 
-sub cycle {
+sub cycle (@) {
     (my @ring = @_) or return sub {};
     my $index = 0;
     sub { $ring[ $index++ % @ring ] }
