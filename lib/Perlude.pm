@@ -1,303 +1,112 @@
 package Perlude;
-use warnings;
-use strict;
-use 5.10.0;
-use Carp;
+use Modern::Perl;
+use Exporter qw< import >;
+our @EXPORT = qw<
 
-use parent 'Exporter';
-our @EXPORT = qw/
-    drop take takeWhile
-    fold unfold
-    filter apply funnel
-    cycle range
-    concat concatC concatMap
-    sum product
-    lines
-/;
+    fold unfold 
+    takeWhile take drop
+    filter apply
+    funnel
+    cycle
 
-# TODO:
-# - UTs for records, lines, stream
-# - Documentations and examples
-# - examples
+>; 
 
-our $VERSION = '0.42';
-
-sub take {
-    my ( $want_more, $some ) = @_;
-    sub { $want_more-- > 0 ?  $some->() : undef }
-}
-
-sub drop {
-    my ( $remove, $some ) = @_; 
-    sub {
-        while ( $remove-- > 0 ) { $some->() or return }
-        $some->();
-    }   
-}
-
-sub takeWhile (&;$) {
-    my ( $test, $list ) = @_;
-    sub {
-        my $block = $list || shift;
-        local $_ = $block->();
-        defined or return undef;
-        $test->() ? $_ : undef;
-    }
+sub unfold (@) {
+    my @array = @_;
+    sub { @array ? shift @array : () }
 }
 
 sub fold ($) {
-    my ( $list ) = @_;
-    my @r;
-    while ( defined ( my $v= $list->() ) ) { push @r,$v }
+    my ( $i ) = @_;
+    my (@r, @v);
+    push @r, @v while @v = $i->();
     @r;
 }
 
-sub funnel (&;$) {
-    my ( $code, $list ) = @_;
-    my $r;
-    $r = $code->() while defined ( local $_ = $list->() );
-    $r;
-}
-
-sub sum     { my $sum=0;  funnel { $sum+=$_  } shift }
-sub product { my $prod=1; funnel { $prod*=$_ } shift }
-
-sub _apply {
-    my ( $filter, $block, $list ) = @_;
+sub takeWhile (&$) {
+    my ($cond, $i ) = @_;
     sub {
-        my $next = $list || shift;
-        while ( defined ( local $_ = $next->() ) ) {
-            if ( $filter ) { $block->() and return $_ }
-            else { return $block->() }
-        }
-        return;
+	( my @v = $i->() ) or return;
+	return $cond->() ? @v : () for @v;
     }
 }
 
-sub concat {
-    my $streams = shift or return sub { undef };
+sub filter (&$) {
+    my ( $cond, $i ) = @_;
     sub {
-        while ( @$streams ) {
-            my $r;
-            defined ( $r = $$streams[0]() ) and return $r;
-            shift @$streams;
-        }
-        return
-    }
-}
-
-sub concatC {
-    my $streams  = shift or return sub { undef };
-    my $s        = $streams->();
-    my $running = 1;
-    sub {
-        my $r;
-        while ($running) {
-            defined ( $r = $s->() ) and return $r;
-            defined ( $s = $streams->() ) or $running = 0;
-        }
-        undef;
-    }
-}
-
-sub apply       (&;$) {         _apply ( 0, @_ ) }
-sub concatMap   (&;$) { concatC _apply ( 0, @_ ) }
-sub filter      (&;$) { _apply         ( 1, @_ ) }
-
-sub cycle {
-    my $cycle = shift;
-    my $index = 0;
-    sub {
-        my $r = $$cycle[$index];
-        if ( ++$index > $#$cycle ) { $index = 0 }
-        $r
-    };
-}
-
-sub range {
-    my ( $min, $max, $step ) = @_;
-    defined $max or die "range without max";
-    $step ||= 1;
-    sub {
-        my $r = $min;
-        if ( $max >= $r ) {
-            $min+=$step;
-            $r;
-        } else { undef }
-    }
-}
-
-sub unfold {
-    my $array = shift;
-    sub { shift @$array }
-}
-
-sub records {
-    my ($source) = @_;
-    sub { <$source> }
-}
-
-sub lines {
-    open my $fh,shift;
-    if ($@) {
-	if ($_[0] ~~ 'chomp') {
-	    sub {
-		my $v = <$fh>;
-		chomp $v;
-		$v
-	    }
-	} else {
-	    croak 'your arguments iz invalid:'
-	    , join ',', @_
+	while (1) {
+	    ( my @v = $i->() ) or return;
+	    $cond->() and return @v for @v;
 	}
     }
-    else { records $fh }
 }
 
-sub stream {
-    my $source = shift;
-    my $method = shift;
-    my @args   = @_;
-    sub { $source->$method(@args) }
+sub take ($$) {
+    my ( $n, $i ) = @_;
+    sub {
+	$n-- > 0 or return;
+	$i->()
+    }
 }
 
-=head1 NAME
+sub drop ($$) {
+    my ( $n, $i ) = @_;
+    fold take $n, $i;
+    $i;
+}
 
-Perlude - a prelude for perl
+sub apply (&$) {
+    my ( $code, $i ) = @_;
+    sub {
+	( my @v = $i->() ) or return;
+	map $code->(), @v;
+    }
+}
 
-=head1 VERSION
+sub cycle (@) {
+    (my @ring = @_) or return sub {};
+    my $index = 0;
+    sub { $ring[ $index++ % @ring ] }
+}
 
-Version 0.01
+1;
 
-=cut
-
-=head1 SYNOPSIS
-
-Perlude functions are filters and consumers for generators (Closures). It
-adds keywords stolen from the haskell world and introduce some perl specific
-ones.
-
-=head1 Rules, naming and conventions
-
-A generator is a closure
-
-* a scalar as a next element
-
-* undef when exhausted
-
-The list of every potential elements of a generator is called "the stream".
-
-sub that takes and returns a closures is a filter, its name is postfixed with a C (mapC, ...).
-
-sub that takes a closure and consume (read) it is a Reader, its name is prefixed with a R (mapR,reduceR,sumR,productR, ...)
-
-keywords stolen from haskell are exceptions to the naming convention (filter,fold,unfold,...)
-
-from haskell: take, takeWhile, filter, fold, (unfold?) concat ...
-
-=head2 Notes for haskell users
-
-As perl doesn't have monads, M and M_ functions are replaced by C (for Closure)
-and R (for Reader). so 
-
-    mapM_ print    => mapR {say}
-    mapM  print    => mapC {say}
-    map (* 2)      => mapC { $_ * 2 }
-
-
-=head1 EXPORT
-
-=head1 FUNCTIONS
-
-=head2 take $n, $C
-
-take $n elements from $C
-
-    fold take 10, sub { state $x=0; $x++ }
-    #  => 0..9
-
-=head2 takeWhile $test, $C
-
-take all the first elements from the closure that matches $test.
-
-    fold takeWhile { $_ < 100 } fibonacci
-    # returns every terms of the fibonacci sequence under 100
-
-=head2 filter $test, $C
-
-remove any elements that matches $test from the steam (as grep does with arrays)
-
-    filter { /3/ } fibonacci
-
-removes every terms of fibonacci sequence that contains the digit 3 
-
-=head2 fold $C
-
-fold every terms of the steam into an array
-
-    my @c4 = fold  take 50 filter {/4/} nat;
-
-@c4 is the array of the first 50 naturals that contains the 4 digit
-
-=head2 unfold $array_ref
-
-stream the array elements
-
-    mapR {say if /5/ } unfold [1..5];
-    is like
-    map {say if /5/} 1..5;
-
-
-=head1 AUTHOR
-
-Marc Chantreux, C<< <khatar at phear.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-lazyness at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lazyness>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Perlude
-
-
-You can also look for information at:
+=head1 AUTHORS
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item *
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lazyness>
+Philippe Bruhat (BooK)
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item *
 
-L<http://annocpan.org/dist/Lazyness>
+Marc Chantreux (eiro)
 
-=item * CPAN Ratings
+=item *
 
-L<http://cpanratings.perl.org/d/Lazyness>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Lazyness>
+Olivier MenguE<eacute> (dolmen)
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGMENTS 
 
+=over 4
 
-=head1 COPYRIGHT & LICENSE
+=item *
 
-Copyright 2010 Marc Chantreux, all rights reserved.
+High five with StE<eacute>phane Payrard (cognominal)
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+=item *
+
+French Perl Workshop 2011
+
+=item *
+
+Chartreuse Verte
+
+=back
 
 =cut
 
-1; # End of Lazyness
+
