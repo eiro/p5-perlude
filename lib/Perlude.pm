@@ -11,6 +11,8 @@ our @EXPORT = qw<
 
 >; 
 
+our $VERSION = '0.50';
+
 sub unfold (@) {
     my @array = @_;
     sub { @array ? shift @array : () }
