@@ -28,26 +28,26 @@ sub fold ($) {
 sub takeWhile (&$) {
     my ($cond, $i ) = @_;
     sub {
-	( my @v = $i->() ) or return;
-	return $cond->() ? @v : () for @v;
+        ( my @v = $i->() ) or return;
+        return $cond->() ? @v : () for @v;
     }
 }
 
 sub filter (&$) {
     my ( $cond, $i ) = @_;
     sub {
-	while (1) {
-	    ( my @v = $i->() ) or return;
-	    $cond->() and return @v for @v;
-	}
+        while (1) {
+            ( my @v = $i->() ) or return;
+            $cond->() and return @v for @v;
+        }
     }
 }
 
 sub take ($$) {
     my ( $n, $i ) = @_;
     sub {
-	$n-- > 0 or return;
-	$i->()
+        $n-- > 0 or return;
+        $i->()
     }
 }
 
@@ -60,8 +60,8 @@ sub drop ($$) {
 sub apply (&$) {
     my ( $code, $i ) = @_;
     sub {
-	( my @v = $i->() ) or return;
-	map $code->(), @v;
+        ( my @v = $i->() ) or return;
+        map $code->(), @v;
     }
 }
 
