@@ -7,7 +7,7 @@ our @EXPORT = qw<
     takeWhile take drop
     filter apply
     funnel
-    cycle
+    cycle tuple
 
 >; 
 
@@ -69,6 +69,14 @@ sub cycle (@) {
     (my @ring = @_) or return sub {};
     my $index = -1;
     sub { $ring[ ( $index += 1 ) %= @ring ] }
+}
+
+sub tuple ($$) {
+    my ( $n, $i ) = @_;
+    sub {
+        my @v = fold take $n, $i;
+        @v ? \@v : ();
+    }
 }
 
 1;
