@@ -73,6 +73,10 @@ sub cycle (@) {
 
 1;
 
+=head1 NAME
+
+Perlude - Lazy lists for Perl
+
 =head1 AUTHORS
 
 =over 4
