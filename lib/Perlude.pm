@@ -8,6 +8,7 @@ our @EXPORT = qw<
     filter apply
     traverse
     cycle tuple
+    buffer
 
 >; 
 
@@ -103,6 +104,17 @@ sub tuple ($$) {
     sub {
         my @v = fold take $n, $i;
         @v ? \@v : ();
+    }
+}
+
+sub buffer ($) {
+    my ($i) = @_;
+    my @b;
+    sub {
+        return shift @b if @b;
+        @b = $i->();
+        return shift @b if @b;
+        return;
     }
 }
 
