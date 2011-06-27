@@ -1,16 +1,16 @@
-Lazyness
+Perlude
 
-Lazyness is a collection of functions to make the closures easy to create and
+Perlude is a collection of functions to make the closures easy to create and
 pipe. It uses haskell keywords as often as it can ( take, takeWhile, cycle,
-filter, fold, mapM, mapM_, ...) 
+filter, fold, ...)
 
-In real world, Lazyness = on-demand + memoization
+In real world, Perlude = on-demand + memoization
 
 In haskell, it's something like:
 
     type Lazy a = IORef (Either (() -> a) a)
 
-Lazyness.pm is more than OCaml Steams as it only implements On demand (i would
+Perlude.pm is more than OCaml Steams as it only implements On demand (i would
 like to figure out how to use memoization without adding a structure level to
 the code).
 
@@ -33,21 +33,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc Lazyness
+    perldoc Perlude
 
 You can also look for information at:
 
     RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lazyness
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perlude
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Lazyness
+        http://annocpan.org/dist/Perlude
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Lazyness
+        http://cpanratings.perl.org/d/Perlude
 
     Search CPAN
-        http://search.cpan.org/dist/Lazyness
+        http://search.cpan.org/dist/Perlude
 
 
 COPYRIGHT AND LICENCE
