@@ -13,6 +13,7 @@ our @EXPORT = qw<
 
 our $VERSION = '0.50';
 
+# interface with the Perl world
 sub unfold (@) {
     my @array = @_;
     sub { @array ? shift @array : () }
@@ -25,6 +26,7 @@ sub fold ($) {
     @r;
 }
 
+# stream consumers (lazy)
 sub takeWhile (&$) {
     my ($cond, $i ) = @_;
     sub {
@@ -65,6 +67,7 @@ sub apply (&$) {
     }
 }
 
+# stream consumers (exhaustive)
 sub traverse (&$) {
     my ( $code, $i ) = @_;
     my @b;
@@ -74,6 +77,7 @@ sub traverse (&$) {
     }
 }
 
+# stream generators
 sub cycle (@) {
     (my @ring = @_) or return sub {};
     my $index = -1;
