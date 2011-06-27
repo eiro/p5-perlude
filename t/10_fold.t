@@ -22,10 +22,3 @@ for my $t (@tests) {
     )
 }
 
-# for my $t (@tests) {
-#     is_deeply
-#     ( [fold unfold @$t]
-#     , $t
-#     , "fold unfold => id"
-#     )
-# }
