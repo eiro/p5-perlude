@@ -11,7 +11,7 @@ my @tests =
 , ["haha"]
 );
 
-plan tests => 0+@tests;
+plan tests => 0+2*@tests;
 
 for my $t (@tests) {
     is_deeply
@@ -21,3 +21,9 @@ for my $t (@tests) {
     )
 }
 
+# fold in void context
+for my $t (@tests) {
+    my $n = @$t;
+    fold apply { $n--; @_ } unfold @$t;
+    is $n, 0;
+}
