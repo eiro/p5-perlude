@@ -67,8 +67,8 @@ sub apply (&$) {
 
 sub cycle (@) {
     (my @ring = @_) or return sub {};
-    my $index = 0;
-    sub { $ring[ $index++ % @ring ] }
+    my $index = -1;
+    sub { $ring[ ( $index += 1 ) %= @ring ] }
 }
 
 1;
