@@ -21,7 +21,12 @@ sub unfold (@) {
 
 sub fold ($) {
     my ( $i ) = @_;
-    my (@r, @v);
+    my @v;
+    unless (defined wantarray) {
+        undef while @v = $i->();
+        return;
+    }
+    my @r;
     push @r, @v while @v = $i->();
     @r;
 }
