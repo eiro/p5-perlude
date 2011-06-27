@@ -69,7 +69,7 @@ sub traverse (&$) {
     my ( $code, $i ) = @_;
     my @b;
     while (1) {
-        ( my @v = $i->() ) or return @b;
+        ( my @v = $i->() ) or return wantarray ? @b : shift @b;
         @b = map $code->(), @v;
     }
 }
