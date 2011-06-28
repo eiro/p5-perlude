@@ -23,7 +23,10 @@ for my $t (@tests) {
 
 # fold in void context
 for my $t (@tests) {
-    my $n = @$t;
-    fold apply { $n--; @_ } unfold @$t;
+    my @l = @$t;
+    my $n = 1+@l;
+    #fold apply { $n--; @_ } unfold @$t;
+    fold sub { $n--; @l ? (shift @l) : () };
     is $n, 0;
 }
+
