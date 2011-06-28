@@ -22,9 +22,15 @@ sub unfold (@) {
 sub fold ($) {
     my ( $i ) = @_;
     my @v;
-    unless (defined wantarray) {
-        undef while @v = $i->();
-        return;
+    unless (wantarray) {
+        if (defined wantarray) {
+            my $n = 0;
+            $n++ while @v = $i->();
+            return $n;
+        } else {
+            undef while @v = $i->();
+            return;
+        }
     }
     my @r;
     push @r, @v while @v = $i->();
