@@ -11,7 +11,7 @@ my @tests =
 , ["haha"]
 );
 
-plan tests => 0+2*@tests;
+plan tests => 3*@tests;
 
 for my $t (@tests) {
     is_deeply
@@ -27,6 +27,12 @@ for my $t (@tests) {
     my $n = 1+@l;
     #fold apply { $n--; @_ } unfold @$t;
     fold sub { $n--; @l ? (shift @l) : () };
-    is $n, 0;
+    is $n, 0, (0+@$t)." elements in void context";
+}
+
+# fold in scalar context
+for my $t (@tests) {
+    my $n = fold unfold @$t;
+    is $n, 0+@$t, (0+@$t)." elements in scalar context";
 }
 
