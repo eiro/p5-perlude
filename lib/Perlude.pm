@@ -11,6 +11,8 @@ our @EXPORT = qw<
 
 >; 
 
+use Carp;
+
 our $VERSION = '0.50';
 
 sub unfold (@) {
@@ -73,6 +75,7 @@ sub cycle (@) {
 
 sub tuple ($$) {
     my ( $n, $i ) = @_;
+    croak "$n is not a valid parameter for tuple()" if $n <= 0;
     sub {
         my @v = fold take $n, $i;
         @v ? \@v : ();
