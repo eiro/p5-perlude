@@ -113,8 +113,7 @@ sub buffer ($) {
     sub {
         return shift @b if @b;
         @b = $i->();
-        return shift @b if @b;
-        return;
+        return @b ? shift @b : ();
     }
 }
 
