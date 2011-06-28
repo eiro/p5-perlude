@@ -1,8 +1,7 @@
 #! /usr/bin/perl
 use Modern::Perl;
-use YAML;
-use Perlude;
 use Test::More;
+use Perlude;
 
 my @takeWhile =
 ( [ sub { $_ < 10 }, [ 1 , 10, 4 ], [1] ]

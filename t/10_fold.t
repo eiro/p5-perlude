@@ -1,8 +1,7 @@
 #! /usr/bin/perl
 use Modern::Perl;
-use YAML;
-use Perlude;
 use Test::More;
+use Perlude;
 
 my @tests =
 ( []
