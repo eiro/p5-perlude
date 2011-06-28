@@ -6,7 +6,7 @@ our @EXPORT = qw<
     fold unfold 
     takeWhile take drop
     filter apply
-    funnel
+    traverse
     cycle
 
 >; 
@@ -62,6 +62,15 @@ sub apply (&$) {
     sub {
         ( my @v = $i->() ) or return;
         map $code->(), @v;
+    }
+}
+
+sub traverse (&$) {
+    my ( $code, $i ) = @_;
+    my @b;
+    while (1) {
+        ( my @v = $i->() ) or return wantarray ? @b : shift @b;
+        @b = map $code->(), @v;
     }
 }
 
