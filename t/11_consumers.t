@@ -16,6 +16,8 @@ my @tests =
 , [ take => 3, unfold( undef, 2 ), [ undef, 2 ] ]
 , [ take => 0, unfold( undef, 2 ), [] ]
 , [ take => -1, unfold( undef, 2 ), [] ]
+, [ take => 'ABC', sub { state $n; $n++ }, [] ]
+, [ take => 0.5, sub { state $n; $n++ }, [ 0 ] ]
 , [ drop => 2, unfold( 1 .. 30 ), [ 3 .. 30 ] ]
 , [ drop => 2, unfold( 0, 1 ), [] ]
 , [ drop => 2, unfold( 0, 1, 2 ), [2] ]
@@ -24,6 +26,8 @@ my @tests =
 , [ drop => 3, unfold( undef, 2 ), [] ]
 , [ drop => 0, unfold( undef, 2 ), [ undef, 2 ] ]
 , [ drop => -1, unfold( undef, 2 ), [ undef, 2 ] ]
+, [ drop => "ABC", unfold( 1 .. 3 ), [ 1 .. 3 ] ]
+, [ drop => 0.1, unfold( 1 .. 3 ), [ 2, 3 ] ]
 , [ filter => sub { $_ % 2 }, unfold( 1, 2, 3 ), [1,3] ]
 , [ filter => sub { $_ % 2 }, sub { state $n = 0; $n++ }
   , [ grep { $_ % 2 } 0 .. ( 2 * $limit ) ]
