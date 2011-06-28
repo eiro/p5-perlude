@@ -25,14 +25,6 @@ sub fold ($) {
     @r;
 }
 
-sub takeWhile (&$) {
-    my ($cond, $i ) = @_;
-    sub {
-        ( my @v = $i->() ) or return;
-        return $cond->() ? @v : () for @v;
-    }
-}
-
 sub filter (&$) {
     my ( $cond, $i ) = @_;
     sub {
@@ -43,13 +35,28 @@ sub filter (&$) {
     }
 }
 
-sub take ($$) {
+sub take (\[$&]$) {
     my ( $n, $i ) = @_;
-    sub {
-        $n-- > 0 or return;
-        $i->()
+    $n = ${$n} while (ref $n) =~ /REF|SCALAR/;
+    if (ref $n eq 'CODE') {
+        my $cond = $n;
+        sub {
+            ( my @v = $i->() ) or return;
+            return $cond->() ? @v : () for @v;
+        }
+    } else {
+        sub {
+            $n-- > 0 or return;
+            $i->()
+        }
     }
 }
+
+sub takeWhile (&$) {
+    my $cond = shift;
+    take $cond, $_[0];
+}
+
 
 sub drop ($$) {
     my ( $n, $i ) = @_;
