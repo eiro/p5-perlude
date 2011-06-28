@@ -7,9 +7,11 @@ our @EXPORT = qw<
     takeWhile take drop
     filter apply
     traverse
-    cycle
+    cycle tuple
 
 >; 
+
+use Carp;
 
 our $VERSION = '0.50';
 
@@ -93,6 +95,15 @@ sub cycle (@) {
     (my @ring = @_) or return sub {};
     my $index = -1;
     sub { $ring[ ( $index += 1 ) %= @ring ] }
+}
+
+sub tuple ($$) {
+    my ( $n, $i ) = @_;
+    croak "$n is not a valid parameter for tuple()" if $n <= 0;
+    sub {
+        my @v = fold take $n, $i;
+        @v ? \@v : ();
+    }
 }
 
 1;
