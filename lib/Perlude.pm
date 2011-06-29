@@ -28,7 +28,7 @@ sub fold ($) {
     unless (wantarray) {
         if (defined wantarray) {
             my $n = 0;
-            $n++ while @v = $i->();
+            $n += @v while @v = $i->();
             return $n;
         } else {
             undef while @v = $i->();
