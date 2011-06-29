@@ -1,5 +1,6 @@
 package Perlude;
 use Modern::Perl;
+use Carp qw< croak >;
 use Exporter qw< import >;
 our @EXPORT = qw<
 
@@ -7,7 +8,8 @@ our @EXPORT = qw<
     takeWhile take drop
     filter apply
     traverse
-    cycle tuple
+    cycle range
+    tuple
 
 >; 
 
@@ -96,6 +98,26 @@ sub cycle (@) {
     my $index = -1;
     sub { $ring[ ( $index += 1 ) %= @ring ] }
 }
+
+sub range ($$;$) {
+    my $begin = shift // croak "range begin undefined";
+    my $end   = shift;
+    my $step  = shift // 1;
+
+    return sub { () } if $step == 0;
+
+    $begin -= $step;
+    if (defined $end) {
+        if ($step > 0) {
+            sub { (($begin += $step) <= $end) ? ($begin) : () }
+        } else {
+            sub { (($begin += $step) >= $end) ? ($begin) : () }
+        }
+    } else {
+        sub { ($begin += $step) }
+    }
+}
+
 
 sub tuple ($$) {
     my ( $n, $i ) = @_;
