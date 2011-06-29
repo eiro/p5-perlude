@@ -61,6 +61,7 @@ sub takeWhile (&$) {
 
 sub filter (&$) {
     my ( $cond, $i ) = @_;
+    $i = _buffer $i;
     sub {
         while (1) {
             ( my @v = $i->() ) or return;
