@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Perlude;
 
 is_deeply [ fold range(1, 1, 1)  ], [ 1 ];
