@@ -81,6 +81,7 @@ sub take ($$) {
 
 sub drop ($$) {
     my ( $n, $i ) = @_;
+    $i = _buffer $i;
     fold take $n, $i;
     $i;
 }
