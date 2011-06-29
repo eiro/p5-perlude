@@ -72,6 +72,7 @@ sub filter (&$) {
 
 sub take ($$) {
     my ( $n, $i ) = @_;
+    $i = _buffer $i;
     sub {
         $n-- > 0 or return;
         $i->()
