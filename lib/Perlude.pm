@@ -8,13 +8,23 @@ our @EXPORT = qw<
     filter apply
     traverse
     cycle tuple
-    buffer
 
 >; 
 
 use Carp;
 
 our $VERSION = '0.50';
+
+# private helpers
+sub _buffer ($) {
+    my ($i) = @_;
+    my @b;
+    sub {
+        return shift @b if @b;
+        @b = ( $i->() );
+        return @b ? shift @b : ();
+    }
+}
 
 # interface with the Perl world
 sub unfold (@) {
@@ -101,19 +111,10 @@ sub cycle (@) {
 sub tuple ($$) {
     my ( $n, $i ) = @_;
     croak "$n is not a valid parameter for tuple()" if $n <= 0;
+    $i = _buffer $i;
     sub {
         my @v = fold take $n, $i;
         @v ? \@v : ();
-    }
-}
-
-sub buffer ($) {
-    my ($i) = @_;
-    my @b;
-    sub {
-        return shift @b if @b;
-        @b = $i->();
-        return @b ? shift @b : ();
     }
 }
 
