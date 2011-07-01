@@ -17,6 +17,17 @@ use Carp;
 
 our $VERSION = '0.50';
 
+# private helpers
+sub _buffer ($) {
+    my ($i) = @_;
+    my @b;
+    sub {
+        return shift @b if @b;
+        @b = ( $i->() );
+        return @b ? shift @b : ();
+    }
+}
+
 # interface with the Perl world
 sub unfold (@) {
     my @array = @_;
@@ -29,7 +40,7 @@ sub fold ($) {
     unless (wantarray) {
         if (defined wantarray) {
             my $n = 0;
-            $n++ while @v = $i->();
+            $n += @v while @v = $i->();
             return $n;
         } else {
             undef while @v = $i->();
@@ -52,6 +63,7 @@ sub takeWhile (&$) {
 
 sub filter (&$) {
     my ( $cond, $i ) = @_;
+    $i = _buffer $i;
     sub {
         while (1) {
             ( my @v = $i->() ) or return;
@@ -62,6 +74,7 @@ sub filter (&$) {
 
 sub take ($$) {
     my ( $n, $i ) = @_;
+    $i = _buffer $i;
     sub {
         $n-- > 0 or return;
         $i->()
@@ -70,6 +83,7 @@ sub take ($$) {
 
 sub drop ($$) {
     my ( $n, $i ) = @_;
+    $i = _buffer $i;
     fold take $n, $i;
     $i;
 }
@@ -122,6 +136,7 @@ sub range ($$;$) {
 sub tuple ($$) {
     my ( $n, $i ) = @_;
     croak "$n is not a valid parameter for tuple()" if $n <= 0;
+    $i = _buffer $i;
     sub {
         my @v = fold take $n, $i;
         @v ? \@v : ();
