@@ -32,7 +32,12 @@ sub _buffer ($) {
 # interface with the Perl world
 sub enlist (&) {
     my ($l) = @_;
-    my $g; $g = sub { ( $g, $l->() ) };
+    my ( $g, @b );
+    $g = sub {
+        return @_
+            ? do { unshift @b, @_; $l }
+            : ( $g, @b ? ( @b, @b = () ) : $l->() );
+    };
 }
 
 sub unfold (@) {
