@@ -20,12 +20,12 @@ our $VERSION = '0.50';
 
 # private helpers
 sub _buffer ($) {
-    my ($i) = @_;
+    my ($l) = @_;
     my @b;
     sub {
-        return shift @b if @b;
-        @b = ( $i->() );
-        return @b ? shift @b : ();
+        return ( $l, shift @b ) if @b;
+        ( undef, @b ) = $l->();
+        return ( $l, @b ? shift @b : () );
     }
 }
 
