@@ -3,13 +3,13 @@ use Modern::Perl;
 use Perlude;
 
 my @pass =
-( [ 3, sub { } ]
+( [ 3, enlist { } ]
 , [ 4, unfold( 0 .. 10 ), [ 0 .. 3 ], [ 4 .. 7 ], [ 8 .. 10 ] ]
 , [ 2.5, unfold( 0 .. 6 ), [ 0 .. 2 ], [ 3 .. 5 ], [ 6 ] ]
 );
 
 my @fail =
-( [ 0, sub { } ]
+( [ 0, enlist { } ]
 , [ -1, unfold( 0 .. 10 ) ]
 , [ 'a', unfold( 0 .. 10 ) ]
 );

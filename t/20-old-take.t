@@ -56,7 +56,7 @@ for my $test (
 
 
 @input = qw/ foo bar test /;
-sub eat { fold take shift, sub { @input ? (shift @input) : () } };
+sub eat { fold take shift, enlist { @input ? (shift @input) : () } };
 
 {
     my $take_test = 1;
@@ -73,7 +73,7 @@ sub eat { fold take shift, sub { @input ? (shift @input) : () } };
 SKIP: {
     skip "mapC not (yet?) reimplmented", 1;
 
-    sub take2ones { take 2, sub { 1 } }
+    sub take2ones { take 2, enlist { 1 } }
 
     $got = [ fold mapC { $_ + 1 } take2ones ];
     $expected = [ 2, 2 ];
@@ -91,13 +91,13 @@ SKIP: {
 
 ($got) = fold drop 2, do {
     my @a = qw/ a b c d e f /;
-    sub { @a ? (shift @a) : () }
+    enlist { @a ? (shift @a) : () }
 };
 is( $got, 'c', 'drop works' );
 
 ($got) = fold drop 2, do {
     my @a = qw/ /;
-    sub { @a ? (shift @a) : () }
+    enlist { @a ? (shift @a) : () }
 };
 is( $got, undef, 'drop works again' );
 

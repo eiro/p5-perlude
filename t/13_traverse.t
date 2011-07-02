@@ -5,8 +5,8 @@ use Perlude;
 sub sum { my $sum = 0; traverse { $sum += $_ } shift }
 
 my @tests =
-( [ undef, sub {} ]
-, [ 10 => take 10, sub {1} ]
+( [ undef, enlist {} ]
+, [ 10 => take 10, enlist {1} ]
 , [ 15 => unfold 1 .. 5 ]
 , [ 0  => take 10, cycle -1, 1 ]
 );

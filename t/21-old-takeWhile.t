@@ -8,7 +8,7 @@ my ( @input, $got, $expected );
 
 my $doubles = do {
     my $seed = 0;
-    sub { $seed+=2 }
+    enlist { $seed+=2 }
 };
 
 my @first  = fold takeWhile { $_ < 5 } $doubles;
