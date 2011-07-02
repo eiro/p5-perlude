@@ -80,11 +80,12 @@ sub filter (&$) {
 }
 
 sub take ($$) {
-    my ( $n, $i ) = @_;
-    $i = _buffer $i;
+    my ( $n, $l ) = @_;
+    $l = _buffer $l;
     sub {
-        $n-- > 0 or return;
-        $i->()
+        $n-- > 0 or return $l;
+        1 < ( ( undef, my @v ) = $l->() ) or return $l;
+        ( $l, @v );
     }
 }
 
