@@ -90,10 +90,10 @@ sub take ($$) {
 }
 
 sub drop ($$) {
-    my ( $n, $i ) = @_;
-    $i = _buffer $i;
-    fold take $n, $i;
-    $i;
+    my ( $n, $l ) = @_;
+    $l = _buffer $l;
+    fold take $n, $l;
+    $l;
 }
 
 sub apply (&$) {
