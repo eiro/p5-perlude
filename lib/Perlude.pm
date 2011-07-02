@@ -97,11 +97,11 @@ sub drop ($$) {
 }
 
 sub apply (&$) {
-    my ( $code, $i ) = @_;
+    my ( $code, $l ) = @_;
     sub {
-        ( my @v = $i->() ) or return;
-        map $code->(), @v;
-    }
+        1 < ( ( undef, my @v ) = $l->() ) or return $l;
+        ( $l, map $code->(), @v );
+    };
 }
 
 # stream consumers (exhaustive)
