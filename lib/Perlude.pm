@@ -34,8 +34,9 @@ sub enlist (&) {
     my ($l) = @_;
     my ( $g, @b );
     $g = sub {
+print "b = @b | _ = @_\n";
         return @_
-            ? do { unshift @b, @_; $l }
+            ? do { @b = @_; $g }
             : ( $g, @b ? ( @b, @b = () ) : $l->() );
     };
 }
@@ -70,7 +71,7 @@ sub takeWhile (&$) {
     sub {
         1 < ( ( undef, my @v ) = $l->() ) or return $l;
         local $_ = shift @v;
-        $cond->() ? ( @v ? $l->(@v) : $l, $_ ) : ( $l->( $_, @v ) );
+        $cond->() ? ( ( @v ? $l->(@v) : $l ), $_ ) : ( $l->( $_, @v ) );
     };
 }
 
@@ -115,7 +116,7 @@ sub traverse (&$) {
     my ( $code, $l ) = @_;
     my @b;
     while (1) {
-        1 < ( ( undef, my @v ) = $l->() ) or return ($l, pop @b);
+        1 < ( ( undef, my @v ) = $l->() ) or return pop @b;
         @b = map $code->(), @v;
     }
 }
