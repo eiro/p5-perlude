@@ -69,7 +69,8 @@ sub takeWhile (&$) {
     my ( $cond, $l ) = @_;
     sub {
         1 < ( ( undef, my @v ) = $l->() ) or return $l;
-        return $cond->() ? ( $l, @v ) : ($l) for @v;
+        local $_ = shift @v;
+        $cond->() ? ( @v ? $l->(@v) : $l, $_ ) : ( $l->( $_, @v ) );
     };
 }
 
