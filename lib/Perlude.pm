@@ -69,14 +69,14 @@ sub takeWhile (&$) {
 }
 
 sub filter (&$) {
-    my ( $cond, $i ) = @_;
-    $i = _buffer $i;
+    my ( $cond, $l ) = @_;
+    $l = _buffer $l;
     sub {
         while (1) {
-            ( my @v = $i->() ) or return;
-            $cond->() and return @v for @v;
+            1 < ( ( undef, my @v ) = $l->() ) or return $l;
+            $cond->() and return ($l, @v) for @v;
         }
-    }
+    };
 }
 
 sub take ($$) {
