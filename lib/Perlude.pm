@@ -41,20 +41,21 @@ sub unfold (@) {
 }
 
 sub fold ($) {
-    my ( $i ) = @_;
+    my ($l) = @_;
     my @v;
     unless (wantarray) {
-        if (defined wantarray) {
+        if ( defined wantarray ) {
             my $n = 0;
-            $n += @v while @v = $i->();
+            $n += @v while 1 < ( ( undef, @v ) = $l->() );
             return $n;
-        } else {
-            undef while @v = $i->();
+        }
+        else {
+            undef while 1 < ( ( undef, @v ) = $l->() );
             return;
         }
     }
     my @r;
-    push @r, @v while @v = $i->();
+    push @r, @v while 1 < ( ( undef, @v ) = $l->() );
     @r;
 }
 
