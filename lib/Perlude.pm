@@ -4,14 +4,15 @@ use Carp qw< croak >;
 use Exporter qw< import >;
 our @EXPORT = qw<
 
-    fold unfold 
+    enlist unfold
+    fold
     takeWhile take drop
     filter apply
     traverse
     cycle range
     tuple
 
->; 
+>;
 
 use Carp;
 
@@ -29,9 +30,14 @@ sub _buffer ($) {
 }
 
 # interface with the Perl world
+sub enlist (&) {
+    my ($l) = @_;
+    my $g; $g = sub { ( $g, $l->() ) };
+}
+
 sub unfold (@) {
     my @array = @_;
-    sub { @array ? shift @array : () }
+    enlist sub { @array ? shift @array : () };
 }
 
 sub fold ($) {
