@@ -139,12 +139,12 @@ sub range ($$;$) {
 
 
 sub tuple ($$) {
-    my ( $n, $i ) = @_;
+    my ( $n, $l ) = @_;
     croak "$n is not a valid parameter for tuple()" if $n <= 0;
-    $i = _buffer $i;
+    $l = _buffer $l;
     sub {
-        my @v = fold take $n, $i;
-        @v ? \@v : ();
+        my @v = fold take $n, $l;
+        ( $l, @v ? \@v : () );
     }
 }
 
