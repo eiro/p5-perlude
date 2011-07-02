@@ -118,7 +118,7 @@ sub traverse (&$) {
 sub cycle (@) {
     (my @ring = @_) or return sub {};
     my $index = -1;
-    sub { $ring[ ( $index += 1 ) %= @ring ] }
+    enlist sub { $ring[ ( $index += 1 ) %= @ring ] }
 }
 
 sub range ($$;$) {
