@@ -28,6 +28,8 @@ my @tests =
 
 plan tests => @tests + 1;
 
+$TODO = '_buffer removed';
+
 # generate the todo list
 my %todo = do {
     no strict 'refs';

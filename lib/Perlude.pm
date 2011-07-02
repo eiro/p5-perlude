@@ -18,26 +18,37 @@ use Carp;
 
 our $VERSION = '0.50';
 
+sub NIL() {
+    sub { (undef) }
+}
+
+
 # private helpers
 sub _buffer ($) {
     my ($l) = @_;
     my @b;
-    sub {
-        return ( $l, shift @b ) if @b;
-        ( undef, @b ) = $l->();
-        return ( $l, @b ? shift @b : () );
+    my $m;
+    $m = sub {
+        return ( $m, shift @b ) if @b;
+        ( $l, @b ) = $l->();
+        return ( $m, @b ? shift @b : () );
     }
 }
 
 # interface with the Perl world
 sub enlist (&) {
-    my ($l) = @_;
-    my $g; $g = sub { ( $g, $l->() ) };
+    my ($i) = @_;
+    my $l;
+    $l = sub {
+        my @v = $i->();
+        @v ? ( $l, @v )
+           : NIL
+    }
 }
 
 sub unfold (@) {
     my @array = @_;
-    enlist sub { @array ? shift @array : () };
+    enlist { @array ? shift @array : () };
 }
 
 sub fold ($) {
@@ -46,62 +57,71 @@ sub fold ($) {
     unless (wantarray) {
         if ( defined wantarray ) {
             my $n = 0;
-            $n += @v while 1 < ( ( undef, @v ) = $l->() );
+            $n += @v while 1 < ( ( $l, @v ) = $l->() );
             return $n;
         }
         else {
-            undef while 1 < ( ( undef, @v ) = $l->() );
+            # The real lazy one: when called in scalar context, values are
+            # ignored:
+            #     undef while defined ( $l = $l->() );
+            # But producers must be able to handle that
+            # So keep that for later and use the eager implementation for now
+            undef while 1 < ( ( $l, @v ) = $l->() );
             return;
         }
     }
     my @r;
-    push @r, @v while 1 < ( ( undef, @v ) = $l->() );
+    push @r, @v while 1 < ( ( $l, @v ) = $l->() );
     @r;
 }
 
 # stream consumers (lazy)
 sub takeWhile (&$) {
     my ( $cond, $l ) = @_;
-    sub {
-        1 < ( ( undef, my @v ) = $l->() ) or return $l;
-        return $cond->() ? ( $l, @v ) : ($l) for @v;
+    my $m;
+    $m = sub {
+        1 < ( ( $l, my @v ) = $l->() ) or return ($l);
+        return $cond->() ? ( $m, @v ) : ( sub { ( $l, @v ) } ) for @v;
     };
 }
 
 sub filter (&$) {
     my ( $cond, $l ) = @_;
-    $l = _buffer $l;
-    sub {
+    #$l = _buffer $l;
+    my $m;
+    $m = sub {
         while (1) {
-            1 < ( ( undef, my @v ) = $l->() ) or return $l;
-            $cond->() and return ($l, @v) for @v;
+            1 < ( ( $l, my @v ) = $l->() ) or return ($l);
+            $cond->() and return ($m, @v) for @v;
         }
     };
 }
 
 sub take ($$) {
     my ( $n, $l ) = @_;
-    $l = _buffer $l;
-    sub {
-        $n-- > 0 or return $l;
-        1 < ( ( undef, my @v ) = $l->() ) or return $l;
-        ( $l, @v );
+    #$l = _buffer $l;
+    my $m;
+    $m = sub {
+        $n-- > 0 or return ($l);
+        1 < ( ( $l, my @v ) = $l->() ) or return ($l);
+        ( $m, @v );
     }
 }
 
 sub drop ($$) {
     my ( $n, $l ) = @_;
-    $l = _buffer $l;
+    #$l = _buffer $l;
     fold take $n, $l;
     $l;
 }
 
 sub apply (&$) {
     my ( $code, $l ) = @_;
-    sub {
-        1 < ( ( undef, my @v ) = $l->() ) or return $l;
-        ( $l, map $code->(), @v );
-    };
+    my $m;
+    $m = sub {
+        1 < ( ( $l, my @v ) = $l->() ) or return $l;
+        ( $m, map $code->(), @v );
+    }
 }
 
 # stream consumers (exhaustive)
@@ -109,16 +129,16 @@ sub traverse (&$) {
     my ( $code, $l ) = @_;
     my @b;
     while (1) {
-        1 < ( ( undef, my @v ) = $l->() ) or return ($l, pop @b);
+        1 < ( ( $l, my @v ) = $l->() ) or return ($l, pop @b);
         @b = map $code->(), @v;
     }
 }
 
 # stream generators
 sub cycle (@) {
-    (my @ring = @_) or return sub {};
+    (my @ring = @_) or return NIL;
     my $index = -1;
-    enlist sub { $ring[ ( $index += 1 ) %= @ring ] }
+    enlist { $ring[ ( $index += 1 ) %= @ring ] }
 }
 
 sub range ($$;$) {
@@ -126,7 +146,7 @@ sub range ($$;$) {
     my $end   = shift;
     my $step  = shift // 1;
 
-    return sub { () } if $step == 0;
+    return NIL if $step == 0;
 
     $begin -= $step;
     my $l;
@@ -141,10 +161,13 @@ sub range ($$;$) {
 sub tuple ($$) {
     my ( $n, $l ) = @_;
     croak "$n is not a valid parameter for tuple()" if $n <= 0;
-    $l = _buffer $l;
-    sub {
-        my @v = fold take $n, $l;
-        ( $l, @v ? \@v : () );
+    #$l = _buffer $l;
+    my $m;
+    $m = sub {
+        $l = take $n, $l;
+        my (@r, @v);
+        push @r, @v while 1 < ( ( $l, @v ) = $l->() );
+        @r ? ( $m, \@r ) : ( $l )
     }
 }
 
