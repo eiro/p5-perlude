@@ -129,15 +129,12 @@ sub range ($$;$) {
     return sub { () } if $step == 0;
 
     $begin -= $step;
-    if (defined $end) {
-        if ($step > 0) {
-            sub { (($begin += $step) <= $end) ? ($begin) : () }
-        } else {
-            sub { (($begin += $step) >= $end) ? ($begin) : () }
-        }
-    } else {
-        sub { ($begin += $step) }
-    }
+    my $l;
+    return $l = defined $end
+        ? $step > 0
+            ? sub { ( ( $begin += $step ) <= $end ) ? ( $l, $begin ) : ($l) }
+            : sub { ( ( $begin += $step ) >= $end ) ? ( $l, $begin ) : ($l) }
+        : sub { ( $l, $begin += $step ) };
 }
 
 
