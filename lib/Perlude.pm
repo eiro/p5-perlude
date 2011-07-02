@@ -61,11 +61,11 @@ sub fold ($) {
 
 # stream consumers (lazy)
 sub takeWhile (&$) {
-    my ($cond, $i ) = @_;
+    my ( $cond, $l ) = @_;
     sub {
-        ( my @v = $i->() ) or return;
-        return $cond->() ? @v : () for @v;
-    }
+        1 < ( ( undef, my @v ) = $l->() ) or return $l;
+        return $cond->() ? ( $l, @v ) : ($l) for @v;
+    };
 }
 
 sub filter (&$) {
