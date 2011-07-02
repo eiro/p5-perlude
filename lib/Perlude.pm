@@ -106,10 +106,10 @@ sub apply (&$) {
 
 # stream consumers (exhaustive)
 sub traverse (&$) {
-    my ( $code, $i ) = @_;
+    my ( $code, $l ) = @_;
     my @b;
     while (1) {
-        ( my @v = $i->() ) or return pop @b;
+        1 < ( ( undef, my @v ) = $l->() ) or return ($l, pop @b);
         @b = map $code->(), @v;
     }
 }
