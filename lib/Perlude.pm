@@ -38,12 +38,21 @@ sub _buffer ($) {
 # interface with the Perl world
 sub enlist (&) {
     my ($i) = @_;
-    my $l;
+    my ( $l, @b );
     $l = sub {
-        my @v = $i->();
-        @v ? ( $l, @v )
-           : NIL
-    }
+        if (@_) {
+            my $n = shift;
+            return ( $l, @b[ 0 .. $n - 1 ] ) if @b >= $n;    # there's enough
+            push @b, my @v = $i->();                         # need more
+            push @b, @v = $i->() while @b < $n && @v;        # MOAR
+            return ( $l, @b < $n ? @b : @b[ 0 .. $n - 1 ] ); # give it a peek
+        }
+        else {
+            return ( $l, shift @b ) if @b;    # use the buffer first
+            push @b, $i->();                  # obtain more items
+            return @b ? ( $l, shift @b ) : NIL;
+        }
+    };
 }
 
 sub unfold (@) {
