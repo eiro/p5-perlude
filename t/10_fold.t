@@ -26,7 +26,7 @@ for my $t (@tests) {
     my @l = @$t;
     my $n = 1+@l;
     #fold apply { $n--; @_ } unfold @$t;
-    fold sub { $n--; @l ? (shift @l) : () };
+    fold enlist sub { $n--; @l ? (shift @l) : () };
     is $n, 0, (0+@$t)." elements in void context";
 }
 
