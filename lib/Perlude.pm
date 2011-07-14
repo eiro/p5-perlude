@@ -22,19 +22,6 @@ sub NIL() {
     sub { (undef) }
 }
 
-
-# private helpers
-sub _buffer ($) {
-    my ($l) = @_;
-    my @b;
-    my $m;
-    $m = sub {
-        return ( $m, shift @b ) if @b;
-        ( $l, @b ) = $l->();
-        return ( $m, @b ? shift @b : () );
-    }
-}
-
 # interface with the Perl world
 sub enlist (&) {
     my ($i) = @_;
@@ -96,7 +83,6 @@ sub takeWhile (&$) {
 
 sub filter (&$) {
     my ( $cond, $l ) = @_;
-    #$l = _buffer $l;
     my $m;
     $m = sub {
         while (1) {
@@ -108,7 +94,6 @@ sub filter (&$) {
 
 sub take ($$) {
     my ( $n, $l ) = @_;
-    #$l = _buffer $l;
     my $m;
     $m = sub {
         $n-- > 0 or return ($l);
@@ -119,7 +104,6 @@ sub take ($$) {
 
 sub drop ($$) {
     my ( $n, $l ) = @_;
-    #$l = _buffer $l;
     fold take $n, $l;
     $l;
 }
@@ -170,7 +154,6 @@ sub range ($$;$) {
 sub tuple ($$) {
     my ( $n, $l ) = @_;
     croak "$n is not a valid parameter for tuple()" if $n <= 0;
-    #$l = _buffer $l;
     my $m;
     $m = sub {
         $l = take $n, $l;
