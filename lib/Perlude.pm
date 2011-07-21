@@ -28,20 +28,39 @@ our $VERSION = '0.50';
 # interface with the Perl world
 sub enlist (&) {
     my ($i) = @_;
-    my ( $l, @b );
+    my $l;
     $l = sub {
-        if (@_) {
+        return ( $l, $i->() ) unless @_;
+        my $n = shift;
+        return ($l) if $n < 1;
+        my $q = $l;
+        my @b; my $b = 0;
+        while ($b < $n) {
+            push @b, $i->();
+            if (@b == $b) {
+                $q = NIL;
+                last;
+            }
+            $b = @b;
+        }
+        my $m;
+        $m = sub {
+            my $b = @b;
+            return ( ($b > 1 ? $m : $q), shift @b ) unless @_;
             my $n = shift;
-            return ( $l, @b[ 0 .. $n - 1 ] ) if @b >= $n;    # there's enough
-            push @b, my @v = $i->();                         # need more
-            push @b, @v = $i->() while @b < $n && @v;        # MOAR
-            return ( $l, @b < $n ? @b : @b[ 0 .. $n - 1 ] ); # give it a peek
-        }
-        else {
-            return ( $l, shift @b ) if @b;    # use the buffer first
-            push @b, $i->();                  # obtain more items
-            return @b ? ( $l, shift @b ) : NIL;
-        }
+            return ( $m, @b[ 0 .. $n-1 ] ) if $n < $b;
+            return ( $m, @b )              if $q == NIL;
+            while ($b < $n) {
+                push @b, $i->();
+                if (@b == $b) {
+                    $q = NIL;
+                    last;
+                }
+                $b = @b;
+            }
+            ( $m, @b );
+        };
+        ( $m, @b );
     };
 }
 
