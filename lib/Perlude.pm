@@ -18,8 +18,10 @@ use Carp;
 
 our $VERSION = '0.50';
 
+sub NIL();
+
 sub NIL() {
-    sub { (undef) }
+    sub { NIL }
 }
 
 # interface with the Perl world
