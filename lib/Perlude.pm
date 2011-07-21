@@ -18,10 +18,11 @@ use Carp;
 
 our $VERSION = '0.50';
 
-sub NIL();
-
-sub NIL() {
-    sub { NIL }
+# End-of-list value: always return itself, with no data
+{
+    my $NIL;
+    $NIL = sub { $NIL };
+    sub NIL() { $NIL }
 }
 
 # interface with the Perl world
