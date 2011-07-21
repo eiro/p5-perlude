@@ -47,3 +47,45 @@ is( scalar @v, 5, 'peek at more than the remaining total' );
 ( $l, @v ) = $l->();
 is_deeply( \@v, [1], 'next item' );
 
+my @tests = (
+    [
+        (unfold 0..5),
+        [6], [0..5],
+        [],  [0],
+        [],  [1],
+        [6], [2..5],
+        [],  [2],
+        [],  [3],
+        [],  [4],
+        [9], [5],
+        [],  [5],
+        [9], [],
+        [],  [],
+    ],
+    [
+        (unfold 0..1),
+        [1], [0],
+        [2], [0..1],
+        [2], [0..1],
+        [],  [0],
+        [2], [1],
+        [],  [1],
+        [2], [],
+        [],  [],
+    ],
+);
+
+my $m = 1;
+while (@tests) {
+    my $t = shift @tests;
+    my $l = shift @$t;
+    my $n = 1;
+    while (@$t) {
+        ($l, my @v) = $l->(@{ shift @$t });
+        is_deeply \@v, (shift @$t), "test $m,$n";
+        $n++;
+    };
+    is $l, Perlude::NIL, "end $m";
+    $m++;
+}
+
