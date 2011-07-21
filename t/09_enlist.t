@@ -73,6 +73,22 @@ my @tests = (
         [2], [],
         [],  [],
     ],
+    [
+        (unfold 0..3),
+        [2], [0..1],
+        [],  [0],
+        [1], [1],
+        [],  [1],
+        [2], [2..3],
+        [],  [2],
+        [],  [3],
+        [1],  [],
+        [],  [],
+    ],
+    [
+        Perlude::NIL,
+        [],  [],
+    ],
 );
 
 my $m = 1;
@@ -83,6 +99,8 @@ while (@tests) {
     while (@$t) {
         ($l, my @v) = $l->(@{ shift @$t });
         is_deeply \@v, (shift @$t), "test $m,$n";
+        ($l,    @v) = $l->(0);
+        is_deeply \@v, [], "test $m,$n: peek 0";
         $n++;
     };
     is $l, Perlude::NIL, "end $m";
