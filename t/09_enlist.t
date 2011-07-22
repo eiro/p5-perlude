@@ -2,13 +2,15 @@ use Modern::Perl;
 use Test::More;
 use Perlude;
 
-plan 'no_plan';
+plan tests => my $tests;
 
 # very basic test
+BEGIN { $tests += 1 }
 my $l = enlist { state $n; $n++ };
 is( ref $l, 'CODE', 'enlist returns a coderef' );
 
 # check some values
+BEGIN { $tests += 3 }
 my @v;
 ( $l, @v ) = $l->();
 is_deeply( \@v, [0], 'first item' );
@@ -18,6 +20,7 @@ is_deeply( \@v, [1], 'peek at the next item' );
 is_deeply( \@v, [1], 'next item' );
 
 # peek at a lot of values at once
+BEGIN { $tests += 3 }
 my $n = int 1000 * rand;
 ( $l, @v ) = $l->($n);
 is( scalar @v, $n, "Peeked at $n items" );
@@ -26,6 +29,7 @@ is( $v[-1], 1 + $n, "Last item is " . ( $n + 1 ) );
 is_deeply( \@v, [2], 'next item' );
 
 # corner cases
+BEGIN { $tests += 4 }
 ( $l, @v ) = $l->(0);
 is( scalar @v, 0, 'peek at nothing' );
 ( $l, @v ) = $l->();
@@ -37,6 +41,7 @@ is( scalar @v, 0, 'peek at nothing (-1)' );
 is_deeply( \@v, [4], 'next item' );
 
 # bounded list
+BEGIN { $tests += 4 }
 $l = unfold 0 .. 5;
 ( $l, @v ) = $l->(6);
 is( scalar @v, 6, 'peek at the remaining items' );
@@ -47,7 +52,9 @@ is( scalar @v, 5, 'peek at more than the remaining total' );
 ( $l, @v ) = $l->();
 is_deeply( \@v, [1], 'next item' );
 
-my @tests = (
+my @tests;
+BEGIN {
+@tests = (
     [
         (unfold 0..5),
         [6], [0..5],
@@ -90,6 +97,9 @@ my @tests = (
         [],  [],
     ],
 );
+
+$tests += @$_ for @tests;
+}
 
 my $m = 1;
 while (@tests) {
