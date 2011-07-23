@@ -70,3 +70,13 @@ Imagine you want to print a file
 h1. Todo
 
 There are now keywords that do not exist in the Haskell world 
+
+h1. Other dynamic langages stuff
+
+    Ruby       : Rubylude was written by Nono after RMLL'11 https://github.com/nono/Rubylude
+    Javascript :
+	http://weepy.github.com/kaffeine/ was quoted it the python pipe intro but i guess it's useless
+	as http://jashkenas.github.com/coffee-script/ is javascript made right.
+      
+    Python     : https://github.com/JulienPalard/Pipe with an introduction here: http://dev-tricks.net/pipe-infix-syntax-for-python
+
