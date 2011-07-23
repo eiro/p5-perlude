@@ -11,6 +11,7 @@ our @EXPORT = qw<
     traverse
     cycle range
     tuple
+    lines
 
 >;
 
@@ -169,6 +170,32 @@ sub tuple ($$) {
         push @r, @v while 1 < ( ( $l, @v ) = $l->() );
         @r ? ( $m, \@r ) : ( $l )
     }
+}
+
+sub lines {
+    # private sub that coerce path to handles
+    state $fh_coerce = sub {
+        my $v = shift;
+        return $v if ref $v;
+        open my ($fh),$v;
+        $fh;
+    };
+    my $fh = $fh_coerce->( pop );
+
+    # only 2 forms accepted for the moment
+    # form 1: lines 'file'
+    @_ or return enlist { <$fh> // () };
+
+    # confess if not 2nd form
+    $_[0] ~~ 'chomp' or confess 'cannot handle parameters ' , join ',', @_ ;
+
+    # lines chomp => 'file'
+    enlist {
+        defined (my $v = <$fh>) or return;
+        chomp $v;
+        $v;
+    }
+
 }
 
 1;
