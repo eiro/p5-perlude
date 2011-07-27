@@ -18,32 +18,31 @@ use Carp;
 
 our $VERSION = '0.50';
 
-sub NIL() {
-    sub { (undef) }
-}
-
-
-# private helpers
-sub _buffer ($) {
-    my ($l) = @_;
-    my @b;
-    my $m;
-    $m = sub {
-        return ( $m, shift @b ) if @b;
-        ( $l, @b ) = $l->();
-        return ( $m, @b ? shift @b : () );
-    }
+# End-of-list value: always return itself, with no data
+{
+    my $NIL;
+    $NIL = sub { $NIL };
+    sub NIL() { $NIL }
 }
 
 # interface with the Perl world
 sub enlist (&) {
     my ($i) = @_;
-    my $l;
+    my ( $l, @b );
     $l = sub {
-        my @v = $i->();
-        @v ? ( $l, @v )
-           : NIL
-    }
+        if (@_) {
+            my $n = shift;
+            return ( $l, @b[ 0 .. $n - 1 ] ) if @b >= $n;    # there's enough
+            push @b, my @v = $i->();                         # need more
+            push @b, @v = $i->() while @b < $n && @v;        # MOAR
+            return ( $l, @b < $n ? @b : @b[ 0 .. $n - 1 ] ); # give it a peek
+        }
+        else {
+            return ( $l, shift @b ) if @b;    # use the buffer first
+            push @b, $i->();                  # obtain more items
+            return @b ? ( $l, shift @b ) : NIL;
+        }
+    };
 }
 
 sub unfold (@) {
@@ -87,7 +86,6 @@ sub takeWhile (&$) {
 
 sub filter (&$) {
     my ( $cond, $l ) = @_;
-    #$l = _buffer $l;
     my $m;
     $m = sub {
         while (1) {
@@ -99,7 +97,6 @@ sub filter (&$) {
 
 sub take ($$) {
     my ( $n, $l ) = @_;
-    #$l = _buffer $l;
     my $m;
     $m = sub {
         $n-- > 0 or return ($l);
@@ -110,7 +107,6 @@ sub take ($$) {
 
 sub drop ($$) {
     my ( $n, $l ) = @_;
-    #$l = _buffer $l;
     fold take $n, $l;
     $l;
 }
@@ -161,7 +157,6 @@ sub range ($$;$) {
 sub tuple ($$) {
     my ( $n, $l ) = @_;
     croak "$n is not a valid parameter for tuple()" if $n <= 0;
-    #$l = _buffer $l;
     my $m;
     $m = sub {
         $l = take $n, $l;
