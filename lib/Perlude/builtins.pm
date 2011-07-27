@@ -31,7 +31,7 @@ my %builtins = (
             )
     ],
     chomp   => [qw( chomp chop )],
-    glob    => [qw( glob gmtime localtime )],
+    glob    => [qw( glob )],
     pack    => [qw( pack )],
     pop     => [qw( pop shift )],
     reverse => [qw( reverse )],
