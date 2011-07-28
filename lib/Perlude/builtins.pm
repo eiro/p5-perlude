@@ -58,8 +58,8 @@ CODE
     stat   => [ '$'   => 'return apply { [ %s $_ ] } $a[0]' ],
     substr => [ '$$$' => << 'CODE' ],
 return $a[1]
-    ? apply { [ %s $_, $a[0], $a[1] ] } $a[2]
-    : apply { [ %s $_, $a[0] ] } $a[2];
+    ? apply { %s $_, $a[0], $a[1] } $a[2]
+    : apply { %s $_, $a[0] } $a[2];
 CODE
     unpack => [ '$$' => 'return apply { [ %s $a[0], $_ ] } $a[1]' ],
 );
