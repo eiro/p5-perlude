@@ -12,6 +12,7 @@ my %builtins = (
             defined
             exp
             eval
+            glob
             hex
             int
             lc
@@ -31,7 +32,6 @@ my %builtins = (
             )
     ],
     chomp   => [qw( chomp chop )],
-    glob    => [qw( glob )],
     pack    => [qw( pack )],
     pop     => [qw( pop shift )],
     reverse => [qw( reverse )],
@@ -46,7 +46,6 @@ my %builtins = (
 my %code = (
     abs     => [ '$'   => 'return apply { %s } $a[0]' ],
     chomp   => [ '$'   => 'return apply { %s; $_ } $a[0]' ],
-    glob    => [ '$'   => 'return apply { [ %s ] } $a[0]' ],
     pack    => [ '$$'  => 'return apply { %s $a[0], @$_ } $a[1]' ],
     pop     => [ '$'   => 'return apply { %s @$_ } $a[0]' ],
     reverse => [ '$'   => 'return apply { scalar %s $_ } $a[0]' ],
