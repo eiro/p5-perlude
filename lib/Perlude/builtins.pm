@@ -68,10 +68,12 @@ CODE
 # generate the functions
 for my $type ( keys %code ) {
     my ( $proto, $code ) = @{ $code{$type} };
+    my $count = $code =~ s/%s/%s/g;
     for my $builtin ( @{ $builtins{$type} } ) {
         no strict 'refs';
         *{"f::$builtin"}
-            = eval sprintf "sub ($proto) { my \@a = \@_; $code }", $builtin;
+            = eval sprintf "sub ($proto) { my \@a = \@_; $code }",
+            ($builtin) x $count;
         die $@ if $@;
     }
 }
