@@ -13,6 +13,7 @@ my %simple = (
     cos       => 'num',
     defined   => 'str',
     exp       => 'num',
+    glob      => 'file',
     hex       => 'hex',
     int       => 'num',
     lcfirst   => 'str',
@@ -38,6 +39,7 @@ my %values = (
     oct => [ 0, 1,  7,   5647251 ],
     chr => [qw( a b c é か )],
     ref => [ [], {}, sub { }, \'a', \1, bless( {}, 'zlonk' ) ],
+    file => [ 'zlonk', '*', 'lib/*' ],
 );
 
 # skip this
