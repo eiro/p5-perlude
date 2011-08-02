@@ -11,7 +11,6 @@ my %builtins = (
             cos
             defined
             exp
-            eval
             glob
             hex
             int
