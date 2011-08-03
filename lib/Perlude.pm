@@ -126,7 +126,7 @@ sub traverse (&$) {
     my ( $code, $l ) = @_;
     my @b;
     while (1) {
-        1 < ( ( $l, my @v ) = $l->() ) or return ($l, pop @b);
+        1 < ( ( $l, my @v ) = $l->() ) or return pop @b;
         @b = map $code->(), @v;
     }
 }

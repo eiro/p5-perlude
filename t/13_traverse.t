@@ -2,7 +2,7 @@ use Modern::Perl;
 use Test::More;
 use Perlude;
 
-sub sum { my $sum = 0; traverse { $sum += $_ } shift }
+sub sum { traverse {state $sum = 0; $sum += $_ } shift }
 
 my @tests =
 ( [ undef, enlist {} ]
