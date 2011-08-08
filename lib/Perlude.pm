@@ -12,6 +12,7 @@ our @EXPORT = qw<
     cycle range
     tuple
     lines
+    concat
 
 >;
 
@@ -44,6 +45,20 @@ sub enlist (&) {
             return @b ? ( $l, shift @b ) : NIL;
         }
     };
+}
+
+sub concat {
+    my ($l, @ls)= @_;
+    my @v;
+    my $r;
+    $r = sub {
+        while ($l) {
+            ( $l, @v ) = $l->();
+            return ($r,@v) if @v;
+            $l = shift @ls;
+        }
+    };
+    $r
 }
 
 sub unfold (@) {
