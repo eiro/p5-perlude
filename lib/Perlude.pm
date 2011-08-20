@@ -212,7 +212,102 @@ sub lines {
 
 =head1 NAME
 
-Perlude - Lazy lists for Perl
+Perlude - an attempt to port a part of Haskell prelude in Perl
+
+=head1 SYNOPSIS
+
+Haskell prelude miss you when you write perl stuff? Perlude is a port of the
+most common keywords. Some other keywords where added when there is no haskell
+equivalent.
+
+Example: in haskell you can write
+
+    nat        = [0..]
+    is_even x  = ( x `mod` 2 ) == 0
+    evens      = filter is_even
+    main       =  mapM_ print
+        $ take 10
+        $ evens nat
+
+in perlude, the same code will be:
+
+    use Perlude;
+    my $nat = enlist { state $x = 0; $x++ };
+    sub is_even { ($_ % 2) == 0 }
+    sub evens   { filter {is_even} shift }
+    traverse {say} take 10, evens $nat
+
+=head1 FUNCTIONS
+
+=head2 relations between the computation world and perl
+
+=head3 enlist
+
+enlist transform a coderef to a lazy list.
+
+    my $nat = enlist { state $x = 0; $x++ }
+
+$nat is a lazy list of the naturals.
+
+=head3 fold
+
+consume a lazy list in an array
+
+    my @top10nat =
+        fold take 10,
+        enlist { state $x=0; $x++ }
+
+=head3 unfold
+
+the conterpart of fold
+
+=head3 take
+
+take the n first elements of a lazy list
+
+=head3 takeWhile
+
+returns the head of a lazy list that matches a crteria.
+
+    sub below { takeWhile { $_ < 1000 } shift }
+    say for fold below 1000, enlist { state $x=0; $x++ }
+
+=head3 drop, dropWhile
+
+like take and takeWhile but remove elements instead of returning them
+
+
+=head3 filter, apply
+
+grep and map alike on lazy lists
+
+    sub double { apply  { $_*2 } shift }
+    sub evens  { filter { ($_ % 2) == 0 } shift }
+
+=head3 traverse 
+
+eval the block for every element of the list.
+
+    traverse {say} take 10, unfold 0..13;
+
+=head3 concat
+
+bind lazy list together.
+
+    traverse {say} take 10, concat
+    ( unfold(1..5)
+    , unfold(20..67)
+    );
+
+=head3 misc. functions
+
+definitely need other namespaces for them!
+
+    cycle range tuple lines
+
+=head3 missing functions
+
+    foldl foldr
 
 =head1 AUTHORS
 
@@ -238,7 +333,7 @@ Olivier MenguE<eacute> (dolmen)
 
 =item *
 
-High five with StE<eacute>phane Payrard (cognominal)
+High five with StE<eacute>phane Payrard (cognominal) and thanks to Nicolas Pouillard (#haskell-fr@freenode) for his help about haskell lazyness.
 
 =item *
 
