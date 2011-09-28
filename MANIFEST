@@ -5,7 +5,6 @@ lib/Perlude/builtins.pm
 MANIFEST
 README
 README.textile
-t/00-load.t
 t/09_enlist.t
 t/10_fold.t
 t/11_consumers.t
