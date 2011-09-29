@@ -1,7 +1,8 @@
 package Perlude;
 use Modern::Perl;
 use Carp qw< croak >;
-use Exporter qw< import >;
+use Exporter ();
+
 our @EXPORT = qw<
 
     enlist unfold
@@ -25,6 +26,11 @@ our $VERSION = '0.50';
     my $NIL;
     $NIL = sub { $NIL };
     sub NIL() { $NIL }
+}
+
+sub import {
+    Modern::Perl->import;
+    goto &Exporter::import;
 }
 
 # interface with the Perl world
