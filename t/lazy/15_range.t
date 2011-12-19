@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More tests => 12;
-use Perlude;
+use Perlude::Lazy;
 
 is_deeply [ fold range(1, 1, 1)  ], [ 1 ];
 is_deeply [ fold range(1, 2, 1)  ], [ 1, 2 ];

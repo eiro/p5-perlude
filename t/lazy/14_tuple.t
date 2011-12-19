@@ -1,6 +1,6 @@
 use Test::More;
 use Modern::Perl;
-use Perlude;
+use Perlude::Lazy;
 
 my @pass =
 ( [ 3, enlist { } ]

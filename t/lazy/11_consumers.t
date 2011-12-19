@@ -1,6 +1,6 @@
 use Modern::Perl;
 use Test::More;
-use Perlude;
+use Perlude::Lazy;
 
 my $limit = 10_000;
 

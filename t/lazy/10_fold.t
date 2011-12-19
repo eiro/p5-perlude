@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 use Modern::Perl;
 use Test::More;
-use Perlude;
+use Perlude::Lazy;
 
 my @tests =
 ( []

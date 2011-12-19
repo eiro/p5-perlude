@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 use strict;
 use warnings;
-use Perlude;
+use Perlude::Lazy;
 use Test::More tests => 12;
 
 my ( @input, $got, $expected );

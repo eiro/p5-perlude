@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 use Modern::Perl;
 use Test::More 'no_plan';
-use Perlude;
+use Perlude::Lazy;
 use autodie;
 
 my $got = [fold concat range(1,4), range(5,10)]; 

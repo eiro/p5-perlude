@@ -1,6 +1,6 @@
 use Modern::Perl;
 use Test::More;
-use Perlude;
+use Perlude::Lazy;
 
 plan tests => my $tests;
 
@@ -93,7 +93,7 @@ BEGIN {
         [],  [],
     ],
     [
-        Perlude::NIL,
+        Perlude::Lazy::NIL,
         [],  [],
     ],
 );
@@ -113,7 +113,7 @@ while (@tests) {
         is_deeply \@v, [], "test $m,$n: peek 0";
         $n++;
     };
-    is $l, Perlude::NIL, "end $m";
+    is $l, Perlude::Lazy::NIL, "end $m";
     $m++;
 }
 

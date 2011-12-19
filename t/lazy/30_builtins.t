@@ -1,7 +1,7 @@
 use Modern::Perl;
 use Test::More;
-use Perlude;
-use Perlude::builtins;
+use Perlude::Lazy;
+use Perlude::Lazy::builtins;
 
 # first get the list of all builtins
 my %builtins = map { $_ => $_ } grep { defined \&{"f::$_"} } keys %f::;

@@ -1,6 +1,6 @@
 use Test::More;
 use Modern::Perl;
-use Perlude;
+use Perlude::Lazy;
 use YAML 'Dump';
 
 my @tests =
