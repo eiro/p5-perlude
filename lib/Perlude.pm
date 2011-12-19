@@ -7,9 +7,11 @@ our @EXPORT = qw<
     fold unfold 
     takeWhile take drop
     filter apply
-    traverse
+    traverse now
     cycle range
     tuple
+    concat concatC
+    records lines 
 
 >; 
 
@@ -92,7 +94,7 @@ sub apply (&$) {
     my ( $code, $i ) = @_;
     sub {
         ( my @v = $i->() ) or return;
-        map $code->(), @v;
+        (map $code->(), @v)[0];
     }
 }
 
@@ -103,6 +105,52 @@ sub traverse (&$) {
     while (1) {
         ( my @v = $i->() ) or return pop @b;
         @b = map $code->(), @v;
+    }
+}
+# TODO: gruik: make an alias
+sub now (&$) {
+    my ( $code, $i ) = @_;
+    my @b;
+    while (1) {
+        ( my @v = $i->() ) or return pop @b;
+        @b = map $code->(), @v;
+    }
+}
+
+sub records {
+    my $source = shift;
+    sub {
+        my $_ = <$source>;
+        if (defined) { chomp       ; $_ }
+        else         { () }
+    }
+}
+
+sub lines ($) {
+    open my( $fh ), shift;
+    records $fh;
+}
+
+sub concat {
+    my ($s, @ss) = @_; # streams
+    my @v;
+    sub {
+        while (1) {
+            @v = $s->() and return @v;
+            $s = shift @ss or return ();
+        }
+    }
+}
+
+sub concatC ($) {
+    my $ss = shift; # stream
+    my ($s) = $ss->() or return sub {()};
+    my @v;
+    sub {
+        while (1) {
+            @v = $s->() and return @v;
+            $s = $ss->() or return ();
+        }
     }
 }
 
