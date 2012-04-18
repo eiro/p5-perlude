@@ -3,14 +3,13 @@ use Modern::Perl;
 use Carp qw< croak >;
 use Exporter qw< import >;
 our @EXPORT = qw<
-
     fold unfold 
     takeWhile take drop
     filter apply
-    traverse now
+    now
     cycle range
     tuple
-    concat concatC
+    concat concatC concatM
     records lines 
 
 >; 
@@ -99,15 +98,6 @@ sub apply (&$) {
 }
 
 # stream consumers (exhaustive)
-sub traverse (&$) {
-    my ( $code, $i ) = @_;
-    my @b;
-    while (1) {
-        ( my @v = $i->() ) or return pop @b;
-        @b = map $code->(), @v;
-    }
-}
-# TODO: gruik: make an alias
 sub now (&$) {
     my ( $code, $i ) = @_;
     my @b;
@@ -119,16 +109,12 @@ sub now (&$) {
 
 sub records {
     my $source = shift;
-    sub {
-        my $_ = <$source>;
-        if (defined) { chomp       ; $_ }
-        else         { () }
-    }
+    sub { <$source> // () }
 }
 
 sub lines ($) {
     open my( $fh ), shift;
-    records $fh;
+    apply {chomp; $_} records $fh;
 }
 
 sub concat {
@@ -152,6 +138,11 @@ sub concatC ($) {
             $s = $ss->() or return ();
         }
     }
+}
+
+sub concatM (&$) {
+    my ( $apply, $stream ) = @_;
+    concatC apply {$apply->()} $stream;
 }
 
 # stream generators
