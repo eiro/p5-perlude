@@ -11,8 +11,9 @@ my $builder = Module::Build->new
 , dist_author         => 'Marc Chantreux <marc.chantreux@biblibre.com>'
 , build_requires => {qw{
 	Test::Pod   1.22
-	Test::More  0
-	YAML        0
+	Modern::Perl 0
+	Test::More   0
+	YAML         0
     }}
 , add_to_cleanup      => [ 'Lazyness-*' ],
 , meta_add =>
