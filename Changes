@@ -1,6 +1,10 @@
 Revision history for Perlude
 
-0.51    2011-08-20    Marc Chantreux - Philippe Bruhat - Olivier Mengué
+0.51    2011-08-20    Marc Chantreux - Burak Gürsoy
+
+    CPAN installation
+
+    * now works thanks to Burak
 
     Back to the roots 
 
