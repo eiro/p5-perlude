@@ -16,7 +16,7 @@ our @EXPORT = qw<
 
 use Carp;
 
-our $VERSION = '0.60';
+our $VERSION = '0.51';
 
 # private helpers
 sub _buffer ($) {
@@ -184,9 +184,14 @@ sub tuple ($$) {
 
 1;
 
+=head1 WARNING
+
+API Changes in version 0.51, please read the Changes file
+
 =head1 NAME
 
 Perlude - Lazy lists for Perl
+
 
 =head1 AUTHORS
 

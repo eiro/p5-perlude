@@ -1,5 +1,24 @@
 Revision history for Perlude
 
-0.42    2011-06-14    Marc Chantreaux
-        First version, released on an unsuspecting world.
+0.51    2011-08-20    Marc Chantreux - Philippe Bruhat - Olivier Mengué
+
+    Back to the roots 
+
+    * () remains
+    * lazy lists are now in Perlude::Lazy
+    * Perlude namespace back to the roots (just streams)
+    * traverse is replaced by now
+    * traverse will be removed in 0.60
+
+0.50    2011-08-20    Marc Chantreux - Philippe Bruhat - Olivier Mengué
+
+    Rewrite from FPW
+
+    * () replaces undef as terminator
+    * lazy list added
+    * enlist added
+
+0.42    2011-06-14    Marc Chantreux
+
+    First version, released on an unsuspecting world.
 
