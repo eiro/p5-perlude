@@ -15,7 +15,7 @@ my $builder = Module::Build->new
 	Test::More   0
 	YAML         0
     }}
-, add_to_cleanup      => [ 'Lazyness-*' ],
+# , add_to_cleanup      => [ 'Lazyness-*' ],
 , meta_add =>
     { homepage => 'https://github.com/eiro/p5-perlude'
     , repository => 'https://github.com/eiro/p5-perlude.git'
