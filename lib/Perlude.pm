@@ -11,12 +11,28 @@ our @EXPORT = qw<
     tuple
     concat concatC concatM
     records lines 
-
+    pairs
 >; 
 
 use Carp;
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
+
+sub pairs ($) {
+    my ( $hash ) = @_;
+    sub {
+	while ( @$_ = each %$hash ) { return $_ }
+	()
+    }
+}
+
+# sub pairs (&$) {
+#     my ( $do, $on ) = @_;
+#     sub {
+# 	while ( @$_ = each %$on ) { return $do->() }
+# 	()
+#     }
+# }
 
 # private helpers
 sub _buffer ($) {
