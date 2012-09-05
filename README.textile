@@ -1,82 +1,19 @@
-h1. Motivation
+steal some keywords of haskell perlude to ease manipulations of iterators and stream in perl.
 
-Even with a decent perl skillset, I stuck to shell scripting to solve many
-problems and dreamed to use a Linux version of PowerShell for many years.
-The reason is Perl has no pipe operator.
+    use Perlude;
+    now {say if /false/} take 2, lines "/etc/passwd";
 
-Reading and writing Haskell programs, I figured out the 3 features which makes pipe a magic operator:
+is the same as
 
-* it's on demand so you write generators without worrying about end conditions, you write filters with no assumptions on the size of the stream and you get programs that keeps low memory profiles whatever the size of the data sources.
-* it's implicit: you know you are handling the current record so you don't have to pass it as argument
-* it's chainable so you easily compose new generators and filters
-* plus: PowerShell can pass objects as records so you don't have to parse and serialize every time anymore
+    open my $fh,"/etc/passwd";
+    my $count = 0;
 
-Perl has the ability to write generators in a very powerful and simple way. 
-Perl has implicity via $_. 
-The only missing part is the filtering toolchain, that's where Perlude came in.
-
-Take a look at this problem: what is the 10 first elements of the Fibonnaci suite that is a multiple of five. First we need a fibonnaci generator. Easy in perl: 
-
-    sub fibonnaci {
-	my @seed = @_;
-	sub {
-	    push @seed, $seed[0] + $seed[1];
-	    shift @seed
-	}
+    while (<$fh>) {
+        if (/root/) {
+            $count++;
+            say;
+        }
+        last if $count == 2;
     }
 
-Now how to find the 10 boys? you can't use grep to filter a generator neither easy way to take only 10 elements from it. so you're doomed to an imperative style.
-
-    my $fib = fibonnaci 1,1;
-    my @boys;
-    for (my $count = 0;; ) {
-	my $v = $fib->();
-	if ( $v % 5 == 0 ) {
-	    push @boys, $v;
-	    last if ++$count == 10;
-	}
-    }
-    say for @boys;
-
-this isn't good! i really would like to write something like:
-
-    say for ( grep { $_ % 5 == 0 } @{infinite_array_from_fibonnaci } )[10]
-
-But you can't. On the other way, that's why Perlude stole keywords from Haskell Prelude. You can write: 
-
-    mapM_ {say} take 10, filter { $_ % 5 == 0 } fibonnaci 1,1;
-    mapC_ {say} takeC 10, grepC { $_ % 5 == 0 } fibonnaci 1,1;
-
-mecanism is simple: 
-every function that takes a closure as argument is postfixed by C. an extra postfix _ is used the fonction tries to consume all the steam.
-every blocks refers to the last element from the generator as $_. 
-an undef $_ means the generator is consummed so the steam can stop.
-
-so an easy grep can be written like this: 
-
-   mapM_ { mapM { print if /test/ } openFile } unfold <*.csv>
-
-note that in this case, only 1 line at time will be in memory.
-
-h1. installation
-
-this distribution is standard cpan module. just use your habits
-
-h1. use
-
-Imagine you want to print a file 
-
-
-h1. Todo
-
-There are now keywords that do not exist in the Haskell world 
-
-h1. Other dynamic langages stuff
-
-    Ruby       : Rubylude was written by Nono after RMLL'11 https://github.com/nono/Rubylude
-    Javascript :
-	http://weepy.github.com/kaffeine/ was quoted it the python pipe intro but i guess it's useless
-	as http://jashkenas.github.com/coffee-script/ is javascript made right.
-      
-    Python     : https://github.com/JulienPalard/Pipe with an introduction here: http://dev-tricks.net/pipe-infix-syntax-for-python
-
+read lib/Perlude/Tutorial.pod for futher informations

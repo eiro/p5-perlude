@@ -1,45 +1,111 @@
+
+
+For those who don't know haskell: think about unix shell or windows powershell in Perl. Perlude is both as a scalar can be either a string or a reference.
+
+The goodness of it is that C<|> is an on demand operator that can easily compose actions on potentially very large amount of data in a very memory friendly way.
+
+The big difference is there is no C<|> operator, so the generator is used as function parameter instead of lhs of the pipe (still, the ease of composition remains). So the perlude notation of
+
+    seq 1000 | sed 5q
+
+is 
+
+    take 5, range 1, 1000
+
+this code returns a new iterator you want to consume, maybe to fold it in a array, maybe to act on each lastly generated element with the keyword C<now> (as "now, compute things you learnt to compute").
+
+    my @five = fold take 5, range 1, 1000;
+    map {say} take 5, range 1, 1000;
+
+a classical, memory agressive, Perl code would be
+
+    map {say} (1..1000)[0..4]
+
+Note that 
+
+    map {say} (1..4)[0..1000]
+
+is an error when 
+
+    now {say} take 1000, range 1,4
+
+still print 4 elements.
+
+=head1 Write your own generators
+
+range function itself is a function that generate an iterator: this kind of
+functions are called generator. take filters the stream sent by the generator,
+it's called a filter.
+
+Perlude comes with all most common filters, i doubt you'll missing one. If you
+do so: please feedback and i'll probably ad it! So your job is about writing
+generators (or using those written in Perlude::Stuff and Perlude::Sh). If you
+have to write a generic one, please contribute.
+
+To write them, you have to understand the Perlude conventions. When you're
+using an iterator, say C<range 1,4>, you have to think about the whole list
+of potential results. Those can be written as
+
+    ( 1, 2, 3, 4     )
+    ( 1, 2, 3, 4,    )
+    ( 1, 2, 3, 4, () )
+
+so C<()> is used as a list terminator. your iterator must return one scalar by
+call and last it work sending a terminator. As exemple:
+
+    sub read_file {
+        open my $fh, shift; 
+        sub { <$fh> // () }
+    }
+
+
 =head1 Perlude tutorial
 
 =head2 Motivation
 
-While programming in Perl, I missed the awesomeness of the shell pipe for a while. Learning haskell and clojure, i discovered they have similar concepts and figured out how perl can easily have it.
+Have you ever miss the shell pipe in Perl? Such a clever operator: it streams data from programs to programs on demand, which means that nothing will compute more than expected by the whole stream, any part the pipe can stop the whole stream.
 
-Perlude bring the pipe concept to perl, stealing keywords from the haskell prelude.
+    seq 1000
 
-=head2 Why is pipe so cool ?
+will compute 1000 lines
 
-Pipe was invented to bind programs together, its inventor (Doug Mc Ilroy) also ennounced the KISS (keep it simple stupid) principles of writing unix programs.
+    seq 1000 | sed 5q
 
-Some programs, like ls generate some content by probing their environement or by computing something. let's call them generators. others apply some changes on the standard input content and write the result of the application on standard output. those commands are called filters. 
+will compute only 5 lines as sed ends its job there. We somehow miss it in perl. Sure, we have grep and map but they are only acting in complete arrays.
 
-Connecting the stdout of programs to stdin of others,  Pipe allow 2 types of compositions
+An "on demand" list can be writen with a subroutine, like 
+
+
+
+
+Perlude is the perl port of a set of haskell prelude keywords which deal with lazy lists or having "on demand lists" in Perl (think about shell pipe, Ocaml Streams, ...). For example.
+
+    grep zsh /etc/passwd | head -n5
+
+Not only it's easy to read and write, its behaviour is also the best expected:
+
+=over
+
+=item *
+
+it reads one record, use it and forget it before reading the next record. This is a memory friendly behavior
+
+=item *
+
+whoever in the pipe can decide to stop it. For example: it's fine for grep to release 3 records only. 
+
+=back
+
+Writing unix filters is really easy. Also note that filters/generators compositions rules are simple and powerfull
 
     G | F => G 
     F | F => F
 
-=over 2
+If you wrote shell, powershell, perl6 or any other functionnal langage, you probably miss it coming back to perl5. 
 
-=item do one thing and do it well
+Basically, on demand lists are just iterators. Perlude is just a pleasant way to deal with them stealing keywords from haskell Perlude. 
 
-=item ???
-
-=item which communicate with others
-
-=back
-
-So it's very easy to combine commands that are really reusable
-
-
-
-As result, the parts of your shell scripts are easier to write and reuse. This is because 
-
-=over 2
-
-=item pipes make things easy to compose, removing loads of loops
-
-=item pipe is "on demand", which means that the computation will stop as soon as one of the elements of the composition reached achievement
-
-=back
+=head3 example
 
 As example:  What are the 5 first naturals containing a 3?
 
@@ -50,6 +116,8 @@ A perl implementation would be:
     ; $count <= 5
     ; $_++ )
     { if (/3/) { $count++; say } }
+
+Hard to read ... and worth: nothing is reusable at all
 
 The shell counterpart would be
 
@@ -78,11 +146,13 @@ No perl builtin provide this power.
 
 =head2 I can haz nat in perl ? 
 
+Perlude is a set of functions that takes closures as arguments, and returns others
+
 nat is the basic closure exemple:
 
     my $nat = sub { state $x=0; $x++ }
 
-a reusable way to write it would be: 
+a reusable way to write it would be:
 
     sub nat_from {
         my $x = shift;
@@ -91,28 +161,19 @@ a reusable way to write it would be:
 
     sub nat { nat_from 0 }
 
-but it didn't help so much while we don't have a head function that can read 5 elements. now Perlude come to the rescue! the perlude version of our problem is
+now you can use Perlude keywords on this functions
 
+    sub evens_in { filter { not( $_ % 2 ) } shift }
+    sub top5 { take 5, shift }
 
+=head1 Other dynamic langages stuff
 
-=head2 Perlude
+    Ruby       : Rubylude was written by Nono after RMLL'11 https://github.com/nono/Rubylude
+    Javascript :
+	http://weepy.github.com/kaffeine/ was quoted it the python pipe intro but i guess it's useless
+	as http://jashkenas.github.com/coffee-script/ is javascript made right.
+    Python     : https://github.com/JulienPalard/Pipe with an introduction here: http://dev-tricks.net/pipe-infix-syntax-for-python
 
+=head1 Contribute
 
-Perlude is a set of functions that takes closures as arguments, and returns others
-
-    now { ta}
-
-
-=head2 take $n, $c
-
-returns
-
-
-
-
-
-
-
-
-
-
+    http://github.com/eiro/p5-perlude
