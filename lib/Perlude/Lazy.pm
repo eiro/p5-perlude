@@ -8,7 +8,7 @@ our @EXPORT = qw<
     fold
     takeWhile take drop
     filter apply
-    traverse
+    now
     cycle range
     tuple
     lines
@@ -135,7 +135,7 @@ sub apply (&$) {
 }
 
 # stream consumers (exhaustive)
-sub traverse (&$) {
+sub now (&$) {
     my ( $code, $l ) = @_;
     my @b;
     while (1) {
