@@ -300,82 +300,117 @@ will return () which is a valid way to end the stream
 =head1 Functions
 
 =head2 Generators
-=head2 Filters
-=head2 Exhausters
 
-=over
+=head3 range $begin, [ $end, [ $step ] ]
 
-=item now {actions} $xs 
+A range of numbers from $begin to $end (infinity if $end isn't set) $step by $step. 
 
-http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take
+    range 5     # from 5 to infinity
+    range 5,9   # 5, 6, 7, 8, 9
+    range 5,9,2 # 5, 7, 9
 
-=item take $n, $xs
+=head3 cycle @set
 
-applied to a list xs, returns the prefix of xs of length n, or xs itself if n > length xs
+infinitly loop on a set of values
 
-    take 5, range 1,10; # 1..5
+    cycle 1,4,7
 
-    fold unfold 
-    takeWhile take drop
-    filter apply
-    now
-    cycle range
-    tuple
-    concat concatC concatM
-    records lines
+    # 1,4,7,1,4,7,1,4,7,1,4,7,1,4,7,...
 
+=head3 records $ref
 
-=head1 functions 
+given any kind of ref that implements the "<>" iterator, returns a Perlude compliant iterator.
 
-=head2 Consumers
+    now {print if /data/} records do {
+        open my $fh,"foo";
+        $fh;
+    };
 
-=head3 now
+=head3 lines
 
-C<now> makes the list ti be eager and returns the last element (eager would be better?).
+same as records but chomp all records before release.
 
-=head3 fold
+    now {say if /data/} records do {
+        open my $fh,"foo";
+        $fh;
+    };
 
-return an array of all computed elements
 
 =head2 filters
 
-=head3 transforming 
-
-    fold unfold 
-    takeWhile take drop
-    filter apply
-    now
-    cycle range
-    tuple
-    concat concatC concatM
-    records lines 
-
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Philippe Bruhat (BooK)
-
-=item *
-
-Marc Chantreux (eiro)
-
-=item *
-
-Olivier MenguE<eacute> (dolmen)
-
-=back
-
-=head1 ACKNOWLEDGMENTS 
-
-=over 4
-
-=item *
-
-During the French Perl Workshop 2011, dolmen suggested to use () as stream terminator. So we (Book, dolmen and me) rewrote Perlude in one night, drinking a bottle of Chartreuse with the support of cognominal. 
-
-=back
-
-
+# =head2 Exhausters
+# 
+# =over
+# 
+# =item now {actions} $xs 
+# 
+# http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take
+# 
+# =item take $n, $xs
+# 
+# applied to a list xs, returns the prefix of xs of length n, or xs itself if n > length xs
+# 
+#     take 5, range 1,10; # 1..5
+# 
+#     fold unfold 
+#     takeWhile take drop
+#     filter apply
+#     now
+#     tuple
+#     concat concatC concatM
+# 
+# =over
+# 
+# 
+# =head1 functions 
+# 
+# =head2 Consumers
+# 
+# =head3 now
+# 
+# C<now> makes the list ti be eager and returns the last element (eager would be better?).
+# 
+# =head3 fold
+# 
+# return an array of all computed elements
+# 
+# =head2 filters
+# 
+# =head3 transforming 
+# 
+#     fold unfold 
+#     takeWhile take drop
+#     filter apply
+#     now
+#     cycle range
+#     tuple
+#     concat concatC concatM
+#     records lines 
+# 
+# =head1 AUTHORS
+# 
+# =over 4
+# 
+# =item *
+# 
+# Philippe Bruhat (BooK)
+# 
+# =item *
+# 
+# Marc Chantreux (eiro)
+# 
+# =item *
+# 
+# Olivier MenguE<eacute> (dolmen)
+# 
+# =head1 ACKNOWLEDGMENTS 
+# 
+# =over 4
+# 
+# =item *
+# 
+# During the French Perl Workshop 2011, dolmen suggested to use () as stream terminator. So we (Book, dolmen and me) rewrote Perlude in one night, drinking a bottle of Chartreuse with the support of cognominal. 
+# 
+# =back
+# 
+# 

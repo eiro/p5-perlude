@@ -17,3 +17,11 @@ is the same as
     }
 
 read lib/Perlude/Tutorial.pod for futher informations
+
+TODO:
+
+* improve documentation
+* improve test suite? 
+* see range implementation # what if step 0 ? 
+* provide an alternative to takeWhile to return the combo breaker
+* explore AST manipulations for futher optimizations
