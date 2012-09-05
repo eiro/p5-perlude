@@ -3,6 +3,11 @@ use Modern::Perl;
 use Perlude::Lazy;
 use YAML 'Dump';
 
+ok 1,"some old tests to restore if someone wants to maintain lazy";
+done_testing;
+
+__END__
+
 my @tests =
 ( [ fold => ( apply {@$_} tuple 3, unfold 1 .. 7 ), [ 1 .. 7 ] ]
 , [ takeWhile =>
