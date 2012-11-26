@@ -1,5 +1,7 @@
 package Perlude;
-use Modern::Perl;
+use strict;
+use warnings;
+use 5.10.0;
 use Carp qw< croak >;
 use Exporter qw< import >;
 our @EXPORT = qw<
@@ -14,9 +16,11 @@ our @EXPORT = qw<
     pairs
 >; 
 
+# ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! 
+
 use Carp;
 
-our $VERSION = '0.52';
+our $VERSION = '0.54';
 
 sub pairs ($) {
     my ( $hash ) = @_;
@@ -129,7 +133,8 @@ sub records {
 }
 
 sub lines (_) {
-    open my( $fh ), shift;
+    my $fh = shift;
+    ref $fh or open $fh, $fh;
     apply {chomp; $_} records $fh;
 }
 
@@ -297,6 +302,8 @@ will return () which is a valid way to end the stream
     mv empty_files_of ls "/tmp/*./txt";
 
 
+=head1 Function composition
+
 =head1 Functions
 
 =head2 Generators
@@ -337,6 +344,43 @@ same as records but chomp all records before release.
 
 
 =head2 filters
+
+filters are composition 
+
+
+=head3 take $n, $xs
+
+take $n, applied to a list $xs, returns the prefix of $xs of length $n, or $xs itself if $n > length $xs:
+
+    sub top10 { take 10, shift }
+
+    take 5, range 1, 10
+    # 1, 2, 3, 4, 5, ()
+
+    take 5, range 1, 3
+    # 1, 2, 3, ()
+    
+=head3 takeWhile $predicate, $xs
+
+takeWhile, applied to a predicate $p and a list $xs, returns the longest prefix (possibly empty) of $xs of elements that satisfy $p
+
+    takeWhile { 10 > ($_*2) } range 1,5
+    # 1, 2, 3, 4
+
+=head3 drop $n, $xs
+
+drop $n $xs returns the suffix of $xs after the first $n elements, or () if $n > length $xs:
+
+    drop 3, range 1,5
+    # 4 , 5 
+
+    drop 3, range 1,2
+    # ()
+
+    
+=head2 Exhausters
+
+    documentation WIP
 
 # =head2 Exhausters
 # 
