@@ -116,23 +116,7 @@ will return () which is a valid way to end the stream
 
 =head1 Function composition
 
-    todo: compare with the prelude documentation
-    # http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:tak
-    #
-    # =item take $n, $xs
-    # 
-    # applied to a list xs, returns the prefix of xs of length n, or xs itself if n > length xs
-    # 
-    #     take 5, range 1,10; # 1..5
-    # 
-    #     concat concatC concatM
-    #     filter apply
-    #     fold unfold 
-    #     now
-    #     takeWhile take drop
-    #     tuple
-    # 
-    # 
+When relevant, i used the Haskell Prelude documentation descriptions and examples. for example, the take documentation comes from http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take
 
 =head1 Functions
 
@@ -177,6 +161,9 @@ same as records but chomp all records before release.
 
 filters are composition functions that take a stream and returns a modified stream.
 
+=head3 filter
+
+=head3 apply
 
 =head3 take $n, $xs
 
@@ -207,27 +194,71 @@ drop $n $xs returns the suffix of $xs after the first $n elements, or () if $n >
     drop 3, range 1,2
     # ()
 
+=head3 dropWhile $predicate, $xs
+
+dropWhile $predicate, $xs returns the suffix remaining after dropWhile $predicate, $xs
+
+     dropWhile { $_ < 3 } unfold [1,2,3,4,5,1,2,3] # [3,4,5,1,2,3]
+     dropWhile { $_ < 9 } unfold [1,2,3]           # []
+     dropWhile { $_ < 0 } unfold [1,2,3]           # [1,2,3]
+
 =head2 misc
-    
+
+=head3 unfold $array
+
+unfold returns an iterator on the $array ref so that every Perlude goodies can be applied. there is no side effect on the referenced array.
+
+    my @lower = fold takeWhile {/data/} unfold $abstract
+
+see also fold
+
 =head2 Exhausters
 
-=over
-
-=item now {actions} $xs
+=head3 now {actions} $xs
 
 read the $xs stream and execute the {actions} block with the returned element
 as $_ until the $xs stream exhausts. it also returns the last transformed element so that it can be used to foldl.
 
 (compare it to perl6 "eager" or haskell foldl) 
 
-=item fold $xs
+=head3 fold $xs
 
 returns the array of all the elements computed by $xs
 
     say join ',',      take 5, sub { state $x=-2; $x+=2 } # CODE(0x180bad8)
     say join ',', fold take 5, sub { state $x=-2; $x+=2 } # 0,2,4,6,8
 
-=back
+see also unfold
+
+=head2 Composers
+
+=head3 concat @streams
+
+concat takes a list of streams and returns them as a unique one: 
+
+    concat map { unfold [split //] } split /\s*/; 
+
+streams every chars of the words of the text
+
+=head3 concatC $stream_of_streams
+
+takes a stream of streams $stream_of_streams and expose them as a single one.
+A stream of streams is a steam that returns streams. 
+
+    concatC { take 3, range $_ } lines $fh
+
+take 3 elements from the range started by the values of $fh, so if $fh contains
+(5,10), the stream is (5,6,7,10,11,12)
+
+=head3 concatM $apply, $stream
+
+applying $apply on each iterations of $stream must return a new stream. concatM
+expose them as a single stream.
+
+    # ls is a generator for a glob
+
+    sub cat { concatM {lines} ls shift } 
+    cat "/tmp/*.conf"
 
 =head1 AUTHORS
 
@@ -256,8 +287,12 @@ Olivier MenguE<eacute> (dolmen)
 Thanks to Nicolas Pouillard and Valentin (#haskell-fr), i leanrt a lot about
 streams, lazyness, lists and so on. Lazyness.pm was my first attempt.
 
+=item *
+
 The name "Perlude" is an idea from Germain Maurice, the amazing sysop of
 http://linkfluence.com back to early 2010.
+
+=item *
 
 Former versions of Perlude used undef as stream terminator. After my talk at
 the French Perl Workshop 2011, dolmen suggested to use () as stream terminator,
@@ -266,7 +301,9 @@ perfect semantic to end a stream. So Book, Dolmen and myself rewrote the
 entire module from scratch in the hall of the hotel with a bottle of chartreuse
 and Cognominal.
 
-We also tried some experiments about real lazyness, momoization 
+We also tried some experiments about real lazyness, memoization and so on. it
+becomes clear now that this is hell to implement correctly: use perl6 instead
+:)
 
 I was drunk and and mispelled Perlude as "Perl dude" so Cognominal collected
 some quotes of "The Big Lebowski" and we called ourselves "the Perl Dudes".
