@@ -1,0 +1,272 @@
+=head1 SYNOPSIS
+
+A math example: every elements of fibo below 1000 (1 element a time in memory)
+
+    use Perlude;
+    use Modern::Perl;
+
+    sub fibo {
+        my @seed = @_;
+        sub {
+            push @seed, $seed[0] + $seed[1];
+            shift @seed
+        }
+    }
+
+    now {say} takeWhile { $_ < 1000 } fibo 1,1;
+
+A sysop example: throw your shellscripts away
+
+    use Perlude;
+    use strictures;
+    use 5.10.0;
+
+    # iterator on a glob matches stolen from Perlude::Sh module
+    sub ls {
+        my $glob = glob shift;
+        my $match;
+        sub {
+            return $match while $match = <$glob>;
+            ();
+        }
+    }
+
+    # show every txt files in /tmp
+    now {say} ls "/tmp/*txt
+
+    # remove empty files from tmp
+    
+    now { unlink if -f && ! -s } ls "/tmp/*"
+
+    # something more reusable/readable ? 
+
+    sub is_empty_file { -f && ! -s }
+    sub empty_files_of { filter {is_empty_file} shift }
+    sub mv { now {unlink} shift }
+
+    mv empty_files_of ls "/tmp/*./txt";
+
+=head1 BASICS and TERMS
+
+Perlude is a brunch of functions (mainly stolen from the haskell perlude) that
+ease programming with iterators by showing them as a stream (list of values that
+may be computed) instead of a sequence of calls. If you're used to a
+functionnal langage, the unix shell or the powershell: you're at home!
+
+See a basic example (explanations and definition right after the code)
+
+    sub seq { # the generator
+
+        my $max = shift;
+        my $x   = 1;
+
+        sub { # the iterator construction
+
+            # returning an empty list means that the stream is exhausted
+            return if $x > $max;
+
+            # else, return the next value of the stream
+            # (undef is a valid value!)
+            $x++;
+        }
+    }
+
+    my $to5 = seq 5; # the iterator
+    # remaining $to5 stream = 1, 2, 3, 4, 5
+
+    say "first iteration: ", $to5->();
+    # prints 1
+    # remaining $to5 stream = 2, 3, 4, 5
+
+    say join ', ', map $to5->(), 1..100;
+    # call the remaining stream: exhaustion
+
+    say to5->();
+    # says nothing: $to5 is an exhausted stream
+
+    # folding: store a stream in a array
+
+    $to5 = seq 75;
+
+    # fold 50 first values
+    my @first = map $to5->(), 1..50;
+
+    # fold 25 last  values
+    my @last = map $to5->(), 1..50;
+
+C<seq> is a "generator": a function that returns a an iterator.
+
+C<$to5> is an "iterator": is a function can compute a complete list by the mean of releasing one element by call.
+
+An "iteration" is the action of calling an iterator.
+
+Folding a stream is the action of releasing a set of the stream values in an array.
+
+We can see an empty list as a tail of any list as all those notations are equivalent
+
+    1, 2, 3, 4, 5
+    1, 2, 3, 4, 5,
+    1, 2, 3, 4, 5, ()
+
+So the empty list is used as convention to say that the stream is exhausted. Note that undef is a valid element of a stream. That's why is C<()> maybe called "bound" in this documentation. Note that Perlude functions are using array context to read the iterators so 
+
+    return unless $something_to_release
+
+will return () which is a valid way to end the stream
+
+=head1 Function composition
+
+    todo: compare with the prelude documentation
+    # http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:tak
+    #
+    # =item take $n, $xs
+    # 
+    # applied to a list xs, returns the prefix of xs of length n, or xs itself if n > length xs
+    # 
+    #     take 5, range 1,10; # 1..5
+    # 
+    #     concat concatC concatM
+    #     filter apply
+    #     fold unfold 
+    #     now
+    #     takeWhile take drop
+    #     tuple
+    # 
+    # 
+
+=head1 Functions
+
+=head2 Generators
+
+=head3 range $begin, [ $end, [ $step ] ]
+
+A range of numbers from $begin to $end (infinity if $end isn't set) $step by $step. 
+
+    range 5     # from 5 to infinity
+    range 5,9   # 5, 6, 7, 8, 9
+    range 5,9,2 # 5, 7, 9
+
+=head3 cycle @set
+
+infinitly loop on a set of values
+
+    cycle 1,4,7
+
+    # 1,4,7,1,4,7,1,4,7,1,4,7,1,4,7,...
+
+=head3 records $ref
+
+given any kind of ref that implements the "<>" iterator, returns a Perlude compliant iterator.
+
+    now {print if /data/} records do {
+        open my $fh,"foo";
+        $fh;
+    };
+
+=head3 lines
+
+same as records but chomp all records before release.
+
+    now {say if /data/} records do {
+        open my $fh,"foo";
+        $fh;
+    };
+
+
+=head2 filters
+
+filters are composition functions that take a stream and returns a modified stream.
+
+
+=head3 take $n, $xs
+
+take $n, applied to a list $xs, returns the prefix of $xs of length $n, or $xs itself if $n > length $xs:
+
+    sub top10 { take 10, shift }
+
+    take 5, range 1, 10
+    # 1, 2, 3, 4, 5, ()
+
+    take 5, range 1, 3
+    # 1, 2, 3, ()
+    
+=head3 takeWhile $predicate, $xs
+
+takeWhile, applied to a predicate $p and a list $xs, returns the longest prefix (possibly empty) of $xs of elements that satisfy $p
+
+    takeWhile { 10 > ($_*2) } range 1,5
+    # 1, 2, 3, 4
+
+=head3 drop $n, $xs
+
+drop $n $xs returns the suffix of $xs after the first $n elements, or () if $n > length $xs:
+
+    drop 3, range 1,5
+    # 4 , 5 
+
+    drop 3, range 1,2
+    # ()
+
+=head2 misc
+    
+=head2 Exhausters
+
+=over
+
+=item now {actions} $xs
+
+read the $xs stream and execute the {actions} block with the returned element
+as $_ until the $xs stream exhausts. it also returns the last transformed element so that it can be used to foldl.
+
+(compare it to perl6 "eager" or haskell foldl) 
+
+=item fold $xs
+
+returns the array of all the elements computed by $xs
+
+    say join ',',      take 5, sub { state $x=-2; $x+=2 } # CODE(0x180bad8)
+    say join ',', fold take 5, sub { state $x=-2; $x+=2 } # 0,2,4,6,8
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Philippe Bruhat (BooK)
+
+=item *
+
+Marc Chantreux (eiro)
+
+=item *
+
+Olivier MenguE<eacute> (dolmen)
+
+=head1 ACKNOWLEDGMENTS 
+
+=over 4
+
+=item *
+
+Thanks to Nicolas Pouillard and Valentin (#haskell-fr), i leanrt a lot about
+streams, lazyness, lists and so on. Lazyness.pm was my first attempt.
+
+The name "Perlude" is an idea from Germain Maurice, the amazing sysop of
+http://linkfluence.com back to early 2010.
+
+Former versions of Perlude used undef as stream terminator. After my talk at
+the French Perl Workshop 2011, dolmen suggested to use () as stream terminator,
+which makes sense not only because undef is a value but also because () is the
+perfect semantic to end a stream. So Book, Dolmen and myself rewrote the
+entire module from scratch in the hall of the hotel with a bottle of chartreuse
+and Cognominal.
+
+We also tried some experiments about real lazyness, momoization 
+
+I was drunk and and mispelled Perlude as "Perl dude" so Cognominal collected
+some quotes of "The Big Lebowski" and we called ourselves "the Perl Dudes".
+This is way my best remember of peer programming and one of the best moment i
+shared with my friends mongueurs.
+
+=back
