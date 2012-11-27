@@ -1,5 +1,6 @@
 steal some keywords of haskell perlude to ease manipulations of iterators and stream in perl.
 
+<pre><code>
     use Perlude;
     now {say if /false/} take 2, lines "/etc/passwd";
 
@@ -15,6 +16,7 @@ is the same as
         }
         last if $count == 2;
     }
+</code></pre>
 
 read lib/Perlude/Tutorial.pod for futher informations
 
