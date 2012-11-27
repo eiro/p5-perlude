@@ -48,7 +48,7 @@ A sysop example: throw your shellscripts away
 
 =head1 BASICS and TERMS
 
-Perlude is a brunch of functions (mainly stolen from the haskell perlude) that
+Perlude is a brunch of functions (mainly stolen from the haskell Prelude) that
 ease programming with iterators by showing them as a stream (list of values that
 may be computed) instead of a sequence of calls. If you're used to a
 functionnal langage, the unix shell or the powershell: you're at home!
@@ -227,6 +227,8 @@ returns the array of all the elements computed by $xs
     say join ',',      take 5, sub { state $x=-2; $x+=2 } # CODE(0x180bad8)
     say join ',', fold take 5, sub { state $x=-2; $x+=2 } # 0,2,4,6,8
 
+=back
+
 =head1 AUTHORS
 
 =over 4
@@ -242,6 +244,8 @@ Marc Chantreux (eiro)
 =item *
 
 Olivier MenguE<eacute> (dolmen)
+
+=back
 
 =head1 ACKNOWLEDGMENTS 
 
