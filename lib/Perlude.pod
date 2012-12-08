@@ -278,6 +278,10 @@ Olivier MenguE<eacute> (dolmen)
 
 =back
 
+=head1 CONTRIBUTORS 
+
+Burak Gürsoy (cpanization)
+
 =head1 ACKNOWLEDGMENTS 
 
 =over 4
