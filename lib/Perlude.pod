@@ -94,7 +94,7 @@ See a basic example (explanations and definition right after the code)
     # fold 25 last  values
     my @last = map $to5->(), 1..50;
 
-C<seq> is a "generator": a function that returns a an iterator.
+C<seq> is a "generator": a function that returns an iterator.
 
 C<$to5> is an "iterator": is a function can compute a complete list by the mean of releasing one element by call.
 
