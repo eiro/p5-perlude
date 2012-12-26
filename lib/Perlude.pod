@@ -42,9 +42,9 @@ A sysop example: throw your shellscripts away
 
     sub is_empty_file { -f && ! -s }
     sub empty_files_of { filter {is_empty_file} shift }
-    sub mv { now {unlink} shift }
+    sub rm { now {unlink} shift }
 
-    mv empty_files_of ls "/tmp/*./txt";
+    rm empty_files_of ls "/tmp/*./txt";
 
 =head1 BASICS and TERMS
 
