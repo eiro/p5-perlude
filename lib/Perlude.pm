@@ -133,9 +133,13 @@ sub records {
 }
 
 sub lines (_) {
-    my $fh = shift;
-    ref $fh or open $fh, $fh;
-    apply {chomp; $_} records $fh;
+    apply {chomp; $_} records do {
+        if ( ref $_[0] ) {shift}
+        else {
+            open my $fh, shift;
+            $fh
+        }
+    }
 }
 
 sub concat {
