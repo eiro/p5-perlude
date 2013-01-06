@@ -230,6 +230,13 @@ returns the array of all the elements computed by $xs
 
 see also unfold
 
+=head3 nth $xs
+
+returns the nth element of a stream
+
+    say fold nth 5, sub { state $x=1; $x++ }
+    # 5
+
 =head2 Composers
 
 =head3 concat @streams
