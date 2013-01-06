@@ -14,6 +14,7 @@ our @EXPORT = qw<
     concat concatC concatM
     records lines 
     pairs
+    nth
 >; 
 
 # ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! 
@@ -205,6 +206,12 @@ sub tuple ($$) {
         my @v = fold take $n, $i;
         @v ? \@v : ();
     }
+}
+
+sub nth {
+    my ( $n, $s ) = @_;
+    $n--;
+    take 1, drop $n, $s 
 }
 
 1;
