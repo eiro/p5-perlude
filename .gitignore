@@ -5,5 +5,4 @@ _build
 *.json
 *.yml
 *.swp
-dist.ini
 perlude-*

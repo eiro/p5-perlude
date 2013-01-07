@@ -21,7 +21,7 @@ our @EXPORT = qw<
 
 use Carp;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 sub pairs ($) {
     my ( $hash ) = @_;
