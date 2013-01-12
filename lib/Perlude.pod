@@ -267,6 +267,16 @@ expose them as a single stream.
     sub cat { concatM {lines} ls shift } 
     cat "/tmp/*.conf"
 
+=head1 TODO
+
+feedbacks are very welcome, todo list: 
+
+    * Improve the doc
+
+github
+
+    http://github.com/eiro/p5-perlude
+
 =head1 AUTHORS
 
 =over 4
