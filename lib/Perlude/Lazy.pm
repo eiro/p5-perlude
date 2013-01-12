@@ -208,9 +208,10 @@ sub lines {
 
 1;
 
-=head1 NAME
+=head1 Perlude::Lazy
 
-Perlude - an attempt to port a part of Haskell prelude in Perl
+An experimentation of implementing real lazy lists in Perl5.
+For real world usecases, please use Perlude instead.
 
 =head1 SYNOPSIS
 
@@ -237,112 +238,7 @@ in perlude, the same code will be:
 
 =head1 FUNCTIONS
 
-=head2 relations between the computation world and perl
-
-=head3 enlist
-
-enlist transform a coderef to a lazy list.
-
-    my $nat = enlist { state $x = 0; $x++ }
-
-$nat is a lazy list of the naturals.
-
-=head3 fold
-
-consume a lazy list in an array
-
-    my @top10nat =
-        fold take 10,
-        enlist { state $x=0; $x++ }
-
-=head3 unfold
-
-the conterpart of fold
-
-=head3 take
-
-take the n first elements of a lazy list
-
-=head3 takeWhile
-
-returns the head of a lazy list that matches a crteria.
-
-    sub below { takeWhile { $_ < 1000 } shift }
-    say for fold below 1000, enlist { state $x=0; $x++ }
-
-=head3 drop, dropWhile
-
-like take and takeWhile but remove elements instead of returning them
-
-
-=head3 filter, apply
-
-grep and map alike on lazy lists
-
-    sub double { apply  { $_*2 } shift }
-    sub evens  { filter { ($_ % 2) == 0 } shift }
-
-=head3 traverse 
-
-eval the block for every element of the list.
-
-    traverse {say} take 10, unfold 0..13;
-
-=head3 concat
-
-bind lazy list together.
-
-    traverse {say} take 10, concat
-    ( unfold(1..5)
-    , unfold(20..67)
-    );
-
-=head3 misc. functions
-
-definitely need other namespaces for them!
-
-    cycle range tuple lines
-
-=head3 missing functions
-
-    foldl foldr
-
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-Philippe Bruhat (BooK)
-
-=item *
-
-Marc Chantreux (eiro)
-
-=item *
-
-Olivier MenguE<eacute> (dolmen)
-
-=back
-
-=head1 ACKNOWLEDGMENTS 
-
-=over 4
-
-=item *
-
-High five with StE<eacute>phane Payrard (cognominal) and thanks to Nicolas Pouillard (#haskell-fr@freenode) for his help about haskell lazyness.
-
-=item *
-
-French Perl Workshop 2011
-
-=item *
-
-Chartreuse Verte
-
-=back
+all the Perlude documentation is relevent. just replace sub by enlist
 
 =cut
-
 
