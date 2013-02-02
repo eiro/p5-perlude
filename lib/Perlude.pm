@@ -178,7 +178,7 @@ sub cycle (@) {
     sub { $ring[ ( $index += 1 ) %= @ring ] }
 }
 
-sub range ($$;$) {
+sub range {
     my $begin = shift // croak "range begin undefined";
     my $end   = shift;
     my $step  = shift // 1;
