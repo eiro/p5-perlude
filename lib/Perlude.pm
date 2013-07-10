@@ -24,11 +24,29 @@ use Carp;
 our $VERSION = '0.56';
 
 sub pairs ($) {
-    my ( $hash ) = @_;
-    sub {
-	while ( @$_ = each %$hash ) { return $_ }
-	()
+    my ( $ref ) = @_;
+    my $isa = ref $ref or die "'$ref' isn't a ref";
+
+    # TODO: use reftypes here!
+    if ($isa eq 'HASH') {
+        sub {
+            my @pair;
+            while ( @pair = each %$ref ) { return \@pair }
+            ()
+        }
     }
+    # elsif ($isa eq 'ARRAY') {
+    #     my $index = 1;
+    #     sub {
+    #         return if $index > @$ref;
+    #         my $r =
+    #             [ $$ref[$index-1]
+    #             , $$ref[$index] ];
+    #         $index+=2;
+    #         $r;
+    #     }
+    # }
+    else { die "can't pair this kind of ref: $isa" }
 }
 
 # sub pairs (&$) {

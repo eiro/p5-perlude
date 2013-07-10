@@ -212,6 +212,34 @@ unfold returns an iterator on the $array ref so that every Perlude goodies can b
 
 see also fold
 
+=head3 pairs $hash
+
+returns an iterator on the pairs of $hash stored in a 2 items array ref.
+
+    now {
+        my ( $k, $v ) = @$_;
+        say "$k : $v";
+    } pairs {qw< a A b B >};
+
+aims to be equivalent to
+
+    my $hash = {qw< a A b B >};
+    while ( my ( $k, $v ) = each %$hash ) {
+        say "$k : $v";
+    }
+
+except that:
+
+=over 4
+
+=item pairs can use an anonymous hash
+
+=item can be used in streams
+
+=item i hate the while syntax 
+
+=back
+
 =head2 Exhausters
 
 =head3 now {actions} $xs

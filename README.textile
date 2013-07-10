@@ -25,5 +25,6 @@ TODO:
 * improve documentation
 * improve test suite? 
 * see range implementation # what if step 0 ? 
+* pairs must support streams and array
 * provide an alternative to takeWhile to return the combo breaker
 * explore AST manipulations for futher optimizations
