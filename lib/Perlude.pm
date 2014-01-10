@@ -15,6 +15,7 @@ our @EXPORT = qw<
     records lines 
     pairs
     nth
+    asplice
 >; 
 
 # ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! 
@@ -231,6 +232,31 @@ sub nth {
     $n--;
     take 1, drop $n, $s 
 }
+
+sub asplice ($$;$) {
+
+    my ( $n, $src, $offset ) = @_;
+    $n > 1 or die "asplice must be at least 1 (don't forget unfold)";
+    $offset //= 0;
+
+    my  ( $end   , $exhausted , $from, $to )
+    =   ( $#$src , 0 );
+
+    sub {
+        return if $exhausted;
+
+        ( $from   , $offset      )=
+        ( $offset , $offset + $n );
+
+        $end <= ($to = $offset - 1) and do {
+            $exhausted=1;
+            $to = $end;
+        };
+
+        [ @{$src}[$from..$to] ];
+    }
+}
+
 
 1;
 
