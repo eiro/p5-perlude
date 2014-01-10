@@ -265,12 +265,12 @@ returns the nth element of a stream
     say fold nth 5, sub { state $x=1; $x++ }
     # 5
 
-=head3 asplice
+=head3 chunksOf
 
 non destructive splice alike (maybe best named as "traverse"? haskell name?).
 you can traverse an array by a group of copies of elements
 
-    say "@$_" for fold asplice 3, ['a'..'f'];
+    say "@$_" for fold chunksOf 3, ['a'..'f'];
     # a b c
     # d e f
 

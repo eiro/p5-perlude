@@ -15,7 +15,7 @@ our @EXPORT = qw<
     records lines 
     pairs
     nth
-    asplice
+    chunksOf
 >; 
 
 # ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! 
@@ -233,10 +233,10 @@ sub nth {
     take 1, drop $n, $s 
 }
 
-sub asplice ($$;$) {
+sub chunksOf ($$;$) {
 
     my ( $n, $src, $offset ) = @_;
-    $n > 1 or die "asplice must be at least 1 (don't forget unfold)";
+    $n > 1 or die "chunksOf must be at least 1 (don't forget unfold)";
     $offset //= 0;
 
     my  ( $end   , $exhausted , $from, $to )

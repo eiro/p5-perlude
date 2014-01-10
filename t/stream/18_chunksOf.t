@@ -7,14 +7,14 @@ use Perlude;
 use YAML;
 
 # this is the reference: don't touch it
-# because asplice means to preserve the content of the original array 
+# because chunksOf means to preserve the content of the original array 
 
 my @reference = 'a'..'f'; # alpha symbols of hexadecimal base
 
 # this is the copy of the reference array!
 my @source    = @reference;
 
-my $got = asplice 3, \@source;
+my $got = chunksOf 3, \@source;
 
 # what we expect $got to produce
 my @expect = 
@@ -26,7 +26,7 @@ now {
     $counter++;
 
     @expect or BAIL_OUT
-        ( "the ${counter}th call to asplice wasn't expected. it contains "
+        ( "the ${counter}th call to chunksOf wasn't expected. it contains "
         . join ',',@$_ );
 
     my $e = shift @expect;
@@ -38,11 +38,11 @@ now {
 
 ok
 ( (0 == @expect)
-, 'asplice finish the job' );
+, 'chunksOf finish the job' );
 
 my @unused = fold $got;
 ok
 ( (0 == @unused)
-, 'asplice dont send extra stuff' )
+, 'chunksOf dont send extra stuff' )
     or diag YAML::Dump \@unused;
 
