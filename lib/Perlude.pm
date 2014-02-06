@@ -16,6 +16,7 @@ our @EXPORT = qw<
     pairs
     nth
     chunksOf
+    open_file
 >; 
 
 # ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! 
@@ -150,6 +151,30 @@ sub now (&$) {
 sub records {
     my $source = shift;
     sub { <$source> // () }
+}
+
+sub open_file {
+    state $open =
+    { 1 => sub { open my $fh, $_[0]; $fh }
+    , 2 => sub { open my $fh, $_[0],$_[1]; $fh }
+    , 3 => sub { open my $fh, $_[0],$_[1],$_[2]; $fh } };
+
+    my $candidate = shift || $_
+        or return;
+
+    ref $candidate
+        and return $candidate;
+
+
+    my $nargs = +@_ or return; # positive number of args
+    $nargs < 3 or do {
+        warn "open has no signature for $nargs arguments. please consult perldoc -f open";
+        return
+    };
+
+    $open
+    -> { $nargs }
+    -> ( @_ );
 }
 
 sub lines (_) {
