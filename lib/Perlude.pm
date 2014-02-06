@@ -165,7 +165,6 @@ sub open_file {
     ref $candidate
         and return $candidate;
 
-
     my $nargs = +@_ or return; # positive number of args
     $nargs < 3 or do {
         warn "open has no signature for $nargs arguments. please consult perldoc -f open";
@@ -177,13 +176,13 @@ sub open_file {
     -> ( @_ );
 }
 
-sub lines (_) {
-    apply {chomp; $_} records do {
-        if ( ref $_[0] ) {shift}
-        else {
-            open my $fh, shift;
-            $fh
-        }
+sub lines {
+    my $fh = &open_file;
+    my $line;
+    sub {
+        return unless defined ( $line = <$fh> );
+        chomp $line;
+        $line;
     }
 }
 
