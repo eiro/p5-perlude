@@ -147,9 +147,36 @@ given any kind of ref that implements the "<>" iterator, returns a Perlude compl
         $fh;
     };
 
+=head3 as_open
+
+just easier (yet safer?) to use wrapper on the sub described in C<perldoc -f open>
+(also L<perlfunc/open>). 
+
+the goal is to have an wrapper on open does a coercion (just return @_ if nothing to do). so
+
+=item * 
+
+don't carre about prototype (so you can call it with an array, not only a list)
+
+=item *
+
+return a FILEHANDLE instead of having a side effect on the first variable
+
+=item *
+
+just return a FILEHANDLE passed as argument (so it's a coercion from C<@_> to an open handler). 
+
+    open FILEHANDLE
+    open EXPR
+    open MODE,EXPR
+    open MODE,EXPR,LIST
+    open MODE,EXPR,REF 
+
+
+
+
 =head3 lines
 
-same as records but chomp all records before release.
 
     now {say if /data/} records do {
         open my $fh,"foo";
