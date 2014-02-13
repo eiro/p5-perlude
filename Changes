@@ -1,5 +1,54 @@
 Revision history for Perlude
 
+0.56    2014-02-13    Marc Chantreux
+
+    * remove ruins from the Module::Starter era
+        * removed deprecated files
+        * README becomes README.textile 
+        * added example from the euler project (see eg/euler)
+
+    * fix all known bugs (some where fixed for long time)
+        * merged MetaJSON pull request (fix #86899) (thanks Dolmen)
+        * this file (Changes) updated (fix RT#86923) (thanks Dolmen)
+
+    * new features
+        * Perlude::Open (open_file)
+        * chunksOf (named after
+          http://hackage.haskell.org/package/text-1.1.0.0/docs/Data-Text.html#v:chunksOf).
+
+    * lines rewritten
+        * now uses open_file, so much richier prototype
+        * no longer relies on &records
+
+            in the first era of Perlude, it was decided to reuse a lot of
+            Perlude to write Perlude. that's why we used apply {} on records. 
+
+            however, i broken this law for lines because: 
+
+            * this part of Perlude is stable for years now
+            * lines performance is critical enough to break laws
+
+0.55    2013-01-06    Marc Chantreux
+
+    * &nth consumer added to pick the nth element of a stream
+    * minor doc fixing
+
+
+0.54    2012-11-27    Marc Chantreux
+
+    * Updated documentation
+        * README to README.textile
+        * POD from lib/Perlude.pm to lib/Perlude.pod
+        * lot of improvement of tutorial (yet unfinished)
+    * Module::Starter replaced by Dist::Zilla
+    * &pairs iterator added (on pairs of an associative array) 
+    * lines now coerce path to file handle 
+    * traverse is now DEPRECATED: use &now instead
+
+0.53    Never released
+
+0.52    Never released
+
 0.51    2011-08-20    Marc Chantreux - Burak Gürsoy
 
     CPAN installation
