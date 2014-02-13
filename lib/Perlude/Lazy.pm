@@ -2,6 +2,7 @@ package Perlude::Lazy;
 use Modern::Perl;
 use Carp qw< croak >;
 use Exporter qw< import >;
+our $VERSION = '0.0';
 our @EXPORT = qw<
 
     enlist unfold

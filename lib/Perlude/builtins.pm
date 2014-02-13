@@ -1,7 +1,8 @@
 package Perlude::builtins;
-
+our $VERSION = '0.0';
 use Modern::Perl;
 use Perlude;
+our $VERSION = '0.0';
 
 my %builtins = (
     abs => [

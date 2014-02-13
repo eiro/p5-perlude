@@ -1,5 +1,10 @@
 Revision history for Perlude
 
+0.57    2014-xx-xx    Marc Chantreux
+
+    * Perlude::Lazy and Perlude::builtins are now in $VERSION '0.0'
+      (PAUSE indexer will appreciate)
+
 0.56    2014-02-13    Marc Chantreux
 
     * remove ruins from the Module::Starter era
