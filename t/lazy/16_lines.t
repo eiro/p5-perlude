@@ -5,7 +5,7 @@ use Perlude::Lazy;
 use autodie;
 
 my @seed = qw/ toto tata tutu /;
-my $file = '/tmp/perlude-test-lines-data';
+my $file = 't/perlude-test-lines-data';
 
 open F,'>',$file;
 say F $_ for @seed;
