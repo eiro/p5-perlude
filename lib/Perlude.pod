@@ -154,6 +154,8 @@ just easier (yet safer?) to use wrapper on the sub described in C<perldoc -f ope
 
 the goal is to have an wrapper on open does a coercion (just return @_ if nothing to do). so
 
+=over 2 
+
 =item * 
 
 don't carre about prototype (so you can call it with an array, not only a list)
@@ -172,8 +174,7 @@ just return a FILEHANDLE passed as argument (so it's a coercion from C<@_> to an
     open MODE,EXPR,LIST
     open MODE,EXPR,REF 
 
-
-
+=back
 
 =head3 lines
 
