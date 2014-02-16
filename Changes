@@ -1,7 +1,8 @@
 Revision history for Perlude
 
-0.57    2014-xx-xx    Marc Chantreux
+0.57    2014-02-17    Marc Chantreux 
 
+    * t/pod.t now pass with the very last Test::Pod version
     * Perlude::Lazy and Perlude::builtins are now in $VERSION '0.0'
       (PAUSE indexer will appreciate)
 
