@@ -1,5 +1,10 @@
 Revision history for Perlude
 
+
+0.58    2014-02-18    Marc Chantreux 
+
+    * t/pod.t fixed encoding
+
 0.57    2014-02-17    Marc Chantreux 
 
     * t/pod.t now pass with the very last Test::Pod version

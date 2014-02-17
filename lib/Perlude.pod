@@ -396,4 +396,8 @@ some quotes of "The Big Lebowski" and we called ourselves "the Perl Dudes".
 This is way my best remember of peer programming and one of the best moment i
 shared with my friends mongueurs.
 
-=back
+=back 
+
+=encoding utf8
+
+=cut
