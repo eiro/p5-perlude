@@ -1,24 +1,6 @@
-steal some keywords of haskell perlude to ease manipulations of iterators and stream in perl.
-
-<pre><code>
-    use Perlude;
-    now {say if /false/} take 2, lines "/etc/passwd";
-
-is the same as
-
-    open my $fh,"/etc/passwd";
-    my $count = 0;
-
-    while (<$fh>) {
-        if (/root/) {
-            $count++;
-            say;
-        }
-        last if $count == 2;
-    }
-</code></pre>
-
-read lib/Perlude/Tutorial.pod for futher informations
+read the pods for more documentation. 
+* lib/Perlude/Tutorial.pod for futher informations
+* lib/Perlude.pod for futher informations
 
 TODO:
 

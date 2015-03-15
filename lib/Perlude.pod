@@ -1,4 +1,118 @@
+=encoding utf8
+
+=head1 GARBAGE
+
+open my $db, "/etc/passwd";
+my $max   = 5;
+my $index = 0;
+my @top5;
+
+while ( $index <= $boundary ) {
+	last unless defined (my $line = <$db> );
+	chomp;
+	last if $line =~ /zsh$/;
+	$top5[$index++] = $line;
+}
+
+open my $db, "/etc/passwd";
+my @places = 0..5;
+my @top5;
+
+open my $db, "/etc/passwd";
+my @top5 = ( grep {chomp; /zsh$/ } <$db> )[0..4];
+
+use Perlude;
+
+my @top5 =
+	fold
+	take 5,
+	filter {/zsh$/}
+	lines "/etc/passwd";
+
+
+	use Perlude;
+	now {say} take 5, lines "/etc/passwd";
+
+
 =head1 SYNOPSIS
+
+Perlude stole some keywords from the Haskell Prelude (mainly) to make iterators
+easy to combine and consume.
+
+If you're used to a unix shell,windows Powershell or any langage comming with
+the notion of streams, perl could be frustrating as functions like map and grep
+only works with arrays.
+
+	map say, grep /foo/, <STDIN>;
+
+Perlude provides "streamed" counterpart where a stream is a set (whole or partial)
+of results an iterator can return.
+
+So to define the basic concepts of Perlude. the functions provided are in the next section.
+
+=head2 an iterator
+
+is a function reference that can produce a list of at least one element at each calls.
+an exhausted iterator returns an empty list.
+
+=head2 an iteration
+
+one call of an iterator
+
+=head2 a stream
+
+the list of all elements an iterator can produce (it may be infinite).
+
+=head2 a generator
+
+is a function that retuns an iterator.
+
+=head2 a filter (think unix shell)
+
+is a function that take an iterator as argument and returns an iterator,
+applying a behavior to the elements of the stream.
+
+such behavior can be removing or adding elements of the stream, exhaust it or
+applying a function in the elements of it.
+
+=head2 a consumer
+
+filters are abount combining things nothing is computed as long as you don't
+use the stream. consumers actually starts to iterate on them (think python3 C<list()> or the perl6 C<&eager>).
+
+=head1 to sumarize
+
+
+A stream is a list finished by an empty list (which makes sense if you come from a functional langage).
+
+	(2,4,6,8,10,())
+
+A an iterator is a function that can return the elements of an iterator one by one. A generator is a function
+that retuns the iterator
+
+	sub from_to { # the generator
+		my ( $from, $to ) = @_;
+		sub { # the iterator
+			return () if $from > $to;
+			my $r = $from;
+			$from+=2;
+			return $r
+		}
+	}
+
+note that perlude authors are used to implicit notations so we're used to write more like
+
+	sub {
+		return if $from > $to;
+		(my $r, $from) = ( $from, $from + 2 );
+		$r;
+	}
+
+(see the code of the C<&lines> generator)
+
+
+=head1 More examples
+
 
 A math example: every elements of fibo below 1000 (1 element a time in memory)
 
@@ -14,6 +128,15 @@ A math example: every elements of fibo below 1000 (1 element a time in memory)
     }
 
     now {say} takeWhile { $_ < 1000 } fibo 1,1;
+
+Used to shell?
+
+    # in sh:
+    # yes "happy birthday" | sed 5q
+
+    sub yes ($msg) { sub { $msg } }
+
+    now {say} take 5, yes "happy birthday"
 
 A sysop example: throw your shellscripts away
 
@@ -35,10 +158,10 @@ A sysop example: throw your shellscripts away
     now {say} ls "/tmp/*txt
 
     # remove empty files from tmp
-    
+
     now { unlink if -f && ! -s } ls "/tmp/*"
 
-    # something more reusable/readable ? 
+    # something more reusable/readable ?
 
     sub is_empty_file { -f && ! -s }
     sub empty_files_of { filter {is_empty_file} shift }
@@ -46,85 +169,20 @@ A sysop example: throw your shellscripts away
 
     rm empty_files_of ls "/tmp/*./txt";
 
-=head1 BASICS and TERMS
-
-Perlude is a brunch of functions (mainly stolen from the haskell Prelude) that
-ease programming with iterators by showing them as a stream (list of values that
-may be computed) instead of a sequence of calls. If you're used to a
-functionnal langage, the unix shell or the powershell: you're at home!
-
-See a basic example (explanations and definition right after the code)
-
-    sub seq { # the generator
-
-        my $max = shift;
-        my $x   = 1;
-
-        sub { # the iterator construction
-
-            # returning an empty list means that the stream is exhausted
-            return if $x > $max;
-
-            # else, return the next value of the stream
-            # (undef is a valid value!)
-            $x++;
-        }
-    }
-
-    my $to5 = seq 5; # the iterator
-    # remaining $to5 stream = 1, 2, 3, 4, 5
-
-    say "first iteration: ", $to5->();
-    # prints 1
-    # remaining $to5 stream = 2, 3, 4, 5
-
-    say join ', ', map $to5->(), 1..100;
-    # call the remaining stream: exhaustion
-
-    say to5->();
-    # says nothing: $to5 is an exhausted stream
-
-    # folding: store a stream in a array
-
-    $to5 = seq 75;
-
-    # fold 50 first values
-    my @first = map $to5->(), 1..50;
-
-    # fold 25 last  values
-    my @last = map $to5->(), 1..50;
-
-C<seq> is a "generator": a function that returns an iterator.
-
-C<$to5> is an "iterator": is a function can compute a complete list by the mean of releasing one element by call.
-
-An "iteration" is the action of calling an iterator.
-
-Folding a stream is the action of releasing a set of the stream values in an array.
-
-We can see an empty list as a tail of any list as all those notations are equivalent
-
-    1, 2, 3, 4, 5
-    1, 2, 3, 4, 5,
-    1, 2, 3, 4, 5, ()
-
-So the empty list is used as convention to say that the stream is exhausted. Note that undef is a valid element of a stream. That's why is C<()> maybe called "bound" in this documentation. Note that Perlude functions are using array context to read the iterators so 
-
-    return unless $something_to_release
-
-will return () which is a valid way to end the stream
 
 =head1 Function composition
 
-When relevant, i used the Haskell Prelude documentation descriptions and examples. for example, the take documentation comes from http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take
+When relevant, i used the Haskell Prelude documentation descriptions and
+examples. for example, the take documentation comes from
+http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take
 
 =head1 Functions
 
-=head2 Generators
+=head2 generators
 
 =head3 range $begin, [ $end, [ $step ] ]
 
-A range of numbers from $begin to $end (infinity if $end isn't set) $step by $step. 
+A range of numbers from $begin to $end (infinity if $end isn't set) $step by $step.
 
     range 5     # from 5 to infinity
     range 5,9   # 5, 6, 7, 8, 9
@@ -150,13 +208,13 @@ given any kind of ref that implements the "<>" iterator, returns a Perlude compl
 =head3 as_open
 
 just easier (yet safer?) to use wrapper on the sub described in C<perldoc -f open>
-(also L<perlfunc/open>). 
+(also L<perlfunc/open>).
 
 the goal is to have an wrapper on open does a coercion (just return @_ if nothing to do). so
 
-=over 2 
+=over 2
 
-=item * 
+=item *
 
 don't carre about prototype (so you can call it with an array, not only a list)
 
@@ -166,13 +224,13 @@ return a FILEHANDLE instead of having a side effect on the first variable
 
 =item *
 
-just return a FILEHANDLE passed as argument (so it's a coercion from C<@_> to an open handler). 
+just return a FILEHANDLE passed as argument (so it's a coercion from C<@_> to an open handler).
 
     open FILEHANDLE
     open EXPR
     open MODE,EXPR
     open MODE,EXPR,LIST
-    open MODE,EXPR,REF 
+    open MODE,EXPR,REF
 
 =back
 
@@ -204,7 +262,7 @@ take $n, applied to a list $xs, returns the prefix of $xs of length $n, or $xs i
 
     take 5, range 1, 3
     # 1, 2, 3, ()
-    
+
 =head3 takeWhile $predicate, $xs
 
 takeWhile, applied to a predicate $p and a list $xs, returns the longest prefix (possibly empty) of $xs of elements that satisfy $p
@@ -217,7 +275,7 @@ takeWhile, applied to a predicate $p and a list $xs, returns the longest prefix 
 drop $n $xs returns the suffix of $xs after the first $n elements, or () if $n > length $xs:
 
     drop 3, range 1,5
-    # 4 , 5 
+    # 4 , 5
 
     drop 3, range 1,2
     # ()
@@ -264,7 +322,7 @@ except that:
 
 =item can be used in streams
 
-=item i hate the while syntax 
+=item i hate the while syntax
 
 =back
 
@@ -275,7 +333,7 @@ except that:
 read the $xs stream and execute the {actions} block with the returned element
 as $_ until the $xs stream exhausts. it also returns the last transformed element so that it can be used to foldl.
 
-(compare it to perl6 "eager" or haskell foldl) 
+(compare it to perl6 "eager" or haskell foldl)
 
 =head3 fold $xs
 
@@ -306,16 +364,16 @@ you can traverse an array by a group of copies of elements
 
 =head3 concat @streams
 
-concat takes a list of streams and returns them as a unique one: 
+concat takes a list of streams and returns them as a unique one:
 
-    concat map { unfold [split //] } split /\s*/; 
+    concat map { unfold [split //] } split /\s*/;
 
 streams every chars of the words of the text
 
 =head3 concatC $stream_of_streams
 
 takes a stream of streams $stream_of_streams and expose them as a single one.
-A stream of streams is a steam that returns streams. 
+A stream of streams is a steam that returns streams.
 
     concatC { take 3, range $_ } lines $fh
 
@@ -329,12 +387,12 @@ expose them as a single stream.
 
     # ls is a generator for a glob
 
-    sub cat { concatM {lines} ls shift } 
+    sub cat { concatM {lines} ls shift }
     cat "/tmp/*.conf"
 
 =head1 TODO
 
-feedbacks are very welcome, todo list: 
+feedbacks are very welcome, todo list:
 
     * Improve the doc
 
@@ -360,11 +418,11 @@ Olivier MenguE<eacute> (dolmen)
 
 =back
 
-=head1 CONTRIBUTORS 
+=head1 CONTRIBUTORS
 
 Burak Gürsoy (cpanization)
 
-=head1 ACKNOWLEDGMENTS 
+=head1 ACKNOWLEDGMENTS
 
 =over 4
 
@@ -396,8 +454,6 @@ some quotes of "The Big Lebowski" and we called ourselves "the Perl Dudes".
 This is way my best remember of peer programming and one of the best moment i
 shared with my friends mongueurs.
 
-=back 
-
-=encoding utf8
+=back
 
 =cut
