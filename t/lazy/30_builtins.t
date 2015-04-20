@@ -1,4 +1,5 @@
-use Modern::Perl;
+use strict;
+use warnings;
 use Test::More
     skip_all  => 'should this module be deprecated?';
 use Perlude::Lazy;

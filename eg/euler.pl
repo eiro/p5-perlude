@@ -1,5 +1,6 @@
 #! /usr/bin/perl
-use Modern::Perl;
+use strict;
+use warnings;
 use autodie;
 use YAML ();
 use Perlude;

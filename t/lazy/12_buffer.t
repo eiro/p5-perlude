@@ -1,5 +1,6 @@
 use Test::More;
-use Modern::Perl;
+use strict;
+use warnings;
 use Perlude::Lazy;
 use YAML 'Dump';
 

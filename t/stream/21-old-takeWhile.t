@@ -1,5 +1,7 @@
 #! /usr/bin/perl
-use Modern::Perl;
+use 5.10.0;
+use strict;
+use warnings;
 use Perlude;
 use Test::More skip_all => 'this is not fixable';
 

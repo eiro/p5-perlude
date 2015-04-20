@@ -1,5 +1,6 @@
 #! /usr/bin/perl
-use Modern::Perl;
+use strict;
+use warnings;
 use Test::More 'no_plan';
 use Perlude;
 use autodie;

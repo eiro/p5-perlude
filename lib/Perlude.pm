@@ -24,7 +24,7 @@ our @EXPORT = qw<
 
 use Carp;
 
-our $VERSION = '0.58';
+our $VERSION = '0.60';
 
 sub pairs ($) {
     my ( $ref ) = @_;

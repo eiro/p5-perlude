@@ -117,7 +117,8 @@ note that perlude authors are used to implicit notations so we're used to write 
 A math example: every elements of fibo below 1000 (1 element a time in memory)
 
     use Perlude;
-    use Modern::Perl;
+    use strict;
+    use warnings;
 
     sub fibo {
         my @seed = @_;

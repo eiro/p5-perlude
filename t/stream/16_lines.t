@@ -1,5 +1,6 @@
 #! /usr/bin/perl
-use Modern::Perl;
+use strict;
+use warnings;
 use Perlude;
 use autodie;
 use Test::More skip_all => 'deprecate line ? records instead ?';

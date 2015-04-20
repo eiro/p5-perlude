@@ -1,7 +1,7 @@
 package Perlude::builtins;
-our $VERSION = '0.0';
-use Modern::Perl;
 use Perlude;
+use strict;
+use warnings;
 our $VERSION = '0.0';
 
 my %builtins = (

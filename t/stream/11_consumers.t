@@ -1,4 +1,6 @@
-use Modern::Perl;
+use strict;
+use warnings;
+use 5.10.0;
 use Test::More;
 use Perlude;
 

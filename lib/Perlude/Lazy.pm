@@ -1,5 +1,7 @@
 package Perlude::Lazy;
-use Modern::Perl;
+use strict;
+use warnings;
+use 5.10.0;
 use Carp qw< croak >;
 use Exporter qw< import >;
 our $VERSION = '0.0';

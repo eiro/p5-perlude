@@ -1,5 +1,6 @@
 #! /usr/bin/perl
-use Modern::Perl;
+use strict;
+use warnings;
 use YAML;
 use Perlude;
 use Test::More;
