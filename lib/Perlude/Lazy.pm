@@ -196,7 +196,7 @@ sub lines {
     @_ or return enlist { <$fh> // () };
 
     # confess if not 2nd form
-    $_[0] ~~ 'chomp' or confess 'cannot handle parameters ' , join ',', @_ ;
+    $_[0] eq 'chomp' or confess 'cannot handle parameters ' , join ',', @_ ;
 
     # lines chomp => 'file'
     enlist {
