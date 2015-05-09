@@ -2,7 +2,6 @@ use Test::More;
 use strict;
 use warnings;
 use Perlude::Lazy;
-use YAML 'Dump';
 
 ok 1,"some old tests to restore if someone wants to maintain lazy";
 done_testing;

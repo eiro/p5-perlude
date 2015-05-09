@@ -42,6 +42,6 @@ ok
 my @unused = fold $got;
 ok
 ( (0 == @unused)
-, 'chunksOf dont send extra stuff' )
-    or diag YAML::Dump \@unused;
+, 'chunksOf dont send extra stuff' );
+
 
