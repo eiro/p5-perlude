@@ -2,7 +2,6 @@ use Test::More;
 use strict;
 use warnings;
 use Perlude;
-use YAML 'Dump';
 
 ok 1
 ,"done testing, please check if those tests are still relevent";

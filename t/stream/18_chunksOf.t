@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Test::More 'no_plan';
 use Perlude;
-use YAML;
 
 # this is the reference: don't touch it
 # because chunksOf means to preserve the content of the original array 

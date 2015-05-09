@@ -1,10 +1,8 @@
 #! /usr/bin/perl
 use strict;
 use warnings;
-use YAML;
 use Perlude;
 use Test::More;
-
 
 eval { fold pairs "haha" };
 ok $@, "die when arg isn't ref";
@@ -39,8 +37,7 @@ for
 ) {
     my ( $desc, $expected, $from ) = @$_;
     my $got = my @r = fold pairs $from;
-    is $got, $expected, $desc
-        or diag YAML::Dump { computed => \@r, from => $from } 
+    is $got, $expected, $desc;
 }
 
 done_testing;
