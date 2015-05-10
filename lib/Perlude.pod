@@ -1,5 +1,10 @@
 =encoding utf8
 
+=for HTML
+<a href="https://travis-ci.org/eiro/p5-perlude"><img src="https://travis-ci.org/eiro/p5-perlude.svg?branch=master"></a>
+<a href="http://badge.fury.io/pl/perlude"><img src="https://badge.fury.io/pl/perlude.svg" alt="CPAN version" height="18"></a>
+<a href="https://coderwall.com/eiro"><img alt="Endorse eiro on Coderwall" src="https://api.coderwall.com/eiro/endorsecount.png"/></a>
+
 =head1 SYNOPSIS 
 
 If you're used to a unix shell, Windows Powershell or any langage comming with
