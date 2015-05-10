@@ -1,44 +1,22 @@
 
+=head1 Write your own generators
 
-For those who don't know haskell: think about unix shell or windows powershell in Perl. Perlude is both as a scalar can be either a string or a reference.
+Have you ever miss the shell pipe in Perl? Such a clever operator: it streams
+data from programs to programs on demand, which means that nothing will compute
+more than expected by the whole stream, any part the pipe can stop the whole
+stream.
 
-The goodness of it is that C<|> is an on demand operator that can easily compose actions on potentially very large amount of data in a very memory friendly way.
+    seq 1000
 
-The big difference is there is no C<|> operator, so the generator is used as function parameter instead of lhs of the pipe (still, the ease of composition remains). So the perlude notation of
+will compute 1000 lines
 
     seq 1000 | sed 5q
 
-is 
-
-    take 5, range 1, 1000
-
-this code returns a new iterator you want to consume, maybe to fold it in a array, maybe to act on each lastly generated element with the keyword C<now> (as "now, compute things you learnt to compute").
-
-    my @five = fold take 5, range 1, 1000;
-    map {say} take 5, range 1, 1000;
-
-a classical, memory agressive, Perl code would be
-
-    map {say} (1..1000)[0..4]
-
-Note that 
-
-    map {say} (1..4)[0..1000]
-
-is an error when 
-
-    now {say} take 1000, range 1,4
-
-still print 4 elements.
-
-=head1 Write your own generators
-
-range function itself is a function that generate an iterator: this kind of
-functions are called generator. take filters the stream sent by the generator,
-it's called a filter.
+will compute only 5 lines as sed ends its job there. We somehow miss it in
+perl. Sure, we have grep and map but they are only acting in complete arrays.
 
 Perlude comes with all most common filters, i doubt you'll missing one. If you
-do so: please feedback and i'll probably ad it! So your job is about writing
+do so: please feedback and i'll probably add it! So your job is about writing
 generators (or using those written in Perlude::Stuff and Perlude::Sh). If you
 have to write a generic one, please contribute.
 
@@ -58,29 +36,16 @@ call and last it work sending a terminator. As exemple:
         sub { <$fh> // () }
     }
 
+now you can write 
 
-=head1 Perlude tutorial
+    now {say}
+        filter {/foo/}
+        take 5,
+        read_file "test.txt"
 
-=head2 Motivation
+which is equivalent to 
 
-Have you ever miss the shell pipe in Perl? Such a clever operator: it streams data from programs to programs on demand, which means that nothing will compute more than expected by the whole stream, any part the pipe can stop the whole stream.
-
-    seq 1000
-
-will compute 1000 lines
-
-    seq 1000 | sed 5q
-
-will compute only 5 lines as sed ends its job there. We somehow miss it in perl. Sure, we have grep and map but they are only acting in complete arrays.
-
-An "on demand" list can be writen with a subroutine, like 
-
-
-
-
-Perlude is the perl port of a set of haskell prelude keywords which deal with lazy lists or having "on demand lists" in Perl (think about shell pipe, Ocaml Streams, ...). For example.
-
-    grep zsh /etc/passwd | head -n5
+    sed 5q test.txt | grep foo 
 
 Not only it's easy to read and write, its behaviour is also the best expected:
 
@@ -88,26 +53,31 @@ Not only it's easy to read and write, its behaviour is also the best expected:
 
 =item *
 
-it reads one record, use it and forget it before reading the next record. This is a memory friendly behavior
+it reads one record, use it and forget it before reading the next record. This
+is a memory friendly behavior
 
 =item *
 
-whoever in the pipe can decide to stop it. For example: it's fine for grep to release 3 records only. 
+whoever in the pipe can decide to stop it. For example: it's fine for grep to
+release 3 records only. 
 
 =back
 
-Writing unix filters is really easy. Also note that filters/generators compositions rules are simple and powerfull
+Writing unix filters is really easy. Also note that filters/generators
+compositions rules are simple and powerfull
 
     G | F => G 
     F | F => F
 
-If you wrote shell, powershell, perl6 or any other functionnal langage, you probably miss it coming back to perl5. 
+If you wrote shell, powershell, perl6 or any other functionnal langage, you
+probably miss it coming back to perl5. 
 
-Basically, on demand lists are just iterators. Perlude is just a pleasant way to deal with them stealing keywords from haskell Perlude. 
+Basically, on demand lists are just iterators. Perlude is just a pleasant way
+to deal with them stealing keywords from haskell Perlude. 
 
 =head3 example
 
-As example:  What are the 5 first naturals containing a 3?
+As example: What are the 5 first naturals containing a 3?
 
 A perl implementation would be:
 
@@ -128,15 +98,25 @@ There are things to understand about the shell elegance:
 
 =over 2
 
-=item there is no need of a counter variable, neither a for loop: head is the single command which handles it for you.
+=item * 
 
-=item the implementation of nat is bare simple: you just focus on your nat problem, you don't care how many elements the filter could need.
+there is no need of a counter variable, neither a for loop: head is the single
+command which handles it for you.
 
-=item you added nat to your toolkit, it's much more pain to resuse it in perl ... before Perlude
+=item *
+
+the implementation of nat is bare simple: you just focus on your nat problem,
+you don't care how many elements the filter could need.
+
+=item *
+
+you added nat to your toolkit, it's much more pain to resuse it in perl ...
+before Perlude
 
 =back
 
-also, it's easy to create a new function 'top5' by passsing a an argument to head (looks like a partial application):
+also, it's easy to create a new function 'top5' by passsing a an argument to
+head (looks like a partial application):
 
     top5 () { head -n5 }
     contains3 () { grep 3 }
@@ -146,7 +126,8 @@ No perl builtin provide this power.
 
 =head2 I can haz nat in perl ? 
 
-Perlude is a set of functions that takes closures as arguments, and returns others
+Perlude is a set of functions that takes closures as arguments, and returns
+others
 
 nat is the basic closure exemple:
 
