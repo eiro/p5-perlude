@@ -5,7 +5,7 @@ Revision history for Perlude
     * removed FUTURE text file as it's now present (also some bloat canceled)
     * reviewed all the PODs, seems to be complete and in the good place now
     * installation tested and approved by Travis
-    * test suite improvements
+    * improved test suite
 
 0.60    2015-05-04    Marc Chantreux
 
