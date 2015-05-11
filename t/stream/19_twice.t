@@ -16,5 +16,4 @@ for
     is_deeply $got, $expected, $desc;
 }
 
-
-
+done_testing;
