@@ -3,12 +3,11 @@ use strict;
 use warnings;
 use Test::More 'no_plan';
 use Perlude::Lazy;
-use autodie;
 
 my @seed = qw/ toto tata tutu /;
 my $file = 't/perlude-test-lines-data';
 
-open F,'>',$file;
+open F,'>',$file or die "can't create test file";
 say F $_ for @seed;
 close F;
 
