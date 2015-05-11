@@ -568,11 +568,18 @@ Explore test suite to know what isn't well tested. find bugs :)
 
 =item *
 
-deprecate open_file and lines (find a companion)
+deprecate open_file and lines (or/and find a companion) as it is out of the 
+scope of Perlude and open_file seems scary (anything to avoid the C<open>
+prototype?). 
+
+=item * reboot C<Perl::builtins>
+
+remove the hardcoded C<f> namespace and use C<use aliased> instead.
 
 =item *
 
-remove C<*::Lazy> and C<*::Builtins> ? ask Book ..
+ask for BooK and Dolmen if they mind to remove C<Perlude::Lazy> as noone seems
+to use it anymore.
 
 =item *
 
