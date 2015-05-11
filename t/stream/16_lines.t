@@ -1,25 +1,22 @@
 #! /usr/bin/perl
 use strict;
 use warnings;
+use Test::More;
 use Perlude;
-use autodie;
-use Test::More skip_all => 'deprecate line ? records instead ?';
+
+note "this should be removed as lines is out of the scope of Perlude";
 
 my @seed = qw/ toto tata tutu /;
-my $file = 't/perlude-test-lines-data';
+my $content = 'toto
+tata
+tutu
+';
 
-open F,'>',$file;
-say F $_ for @seed;
-close F;
+open my $file, '<', \$content;
 
 is_deeply
 ( [fold lines $file]
-, [map { "$_\n" } @seed]
+, [map { "$_" } @seed]
 , "raw lines" );
 
-is_deeply
-( [fold lines chomp => $file]
-, \@seed
-, "chomped lines" );
-
-unlink $file;
+done_testing;
