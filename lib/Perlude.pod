@@ -5,7 +5,7 @@
 <a href="http://badge.fury.io/pl/perlude"><img src="https://badge.fury.io/pl/perlude.svg" alt="CPAN version" height="18"></a>
 <a href="https://coderwall.com/eiro"><img alt="Endorse eiro on Coderwall" src="https://api.coderwall.com/eiro/endorsecount.png"/></a>
 
-=head1 SYNOPSIS 
+=head1 SYNOPSIS
 
 If you're used to a unix shell, Windows Powershell or any langage comming with
 the notion of streams, perl could be frustrating as functions like map and grep
@@ -18,7 +18,7 @@ and you can control the amount of consummed data in a friendly way.
 Perlude gives a better C<|> to Perl: as it works on scalars which can be both
 strings (like unix shell), numbers or references (like powershell).
 
-In L<Perlude::Tutorial> i show examples 
+In L<Perlude::Tutorial> i show examples
 
 The big difference is there is no C<|> operator, so the generator is used as
 function parameter instead of lhs of the pipe (still, the ease of composition
@@ -26,7 +26,7 @@ remains). So the perlude notation of
 
     seq 1000 | sed 5q
 
-is 
+is
 
     take 5, range 1, 1000
 
@@ -41,11 +41,11 @@ a classical, memory agressive, Perl code would be
 
     map {say} (1..1000)[0..4]
 
-Note that 
+Note that
 
     map {say} (1..4)[0..1000]
 
-is an error when 
+is an error when
 
     now {say} take 1000, range 1,4
 
@@ -93,16 +93,16 @@ one call of an iterator
 the list of all elements an iterator can produce (it may be infinite).
 
 the five first elements of the stream of C<$counter>
-(if it wasn't previously used) is 
+(if it wasn't previously used) is
 
     my @top5 = map $counter->(), 1..5;
 
-the perlude counterpart is 
+the perlude counterpart is
 
     my @top5 = fold take 5, $counter;
 
 =head2 a generator
- 
+
 is a function that retuns an iterator.
 
     sub counter ($) {
@@ -113,7 +113,7 @@ is a function that retuns an iterator.
 
     my $iterator = counter 1;
     print $iterator->();
-    
+
 =head2 a filter
 
 is a function that take an iterator as argument and returns an iterator,
@@ -122,7 +122,7 @@ applying a behavior to the elements of the stream.
 such behavior can be removing or adding elements of the stream, exhaust it or
 applying a function in the elements of it.
 
-some filters are Perlude counterparts of the perl C<map> and C<grep>, other can 
+some filters are Perlude counterparts of the perl C<map> and C<grep>, other can
 control the way the stream is consumed (think of them as unix shell filters).
 
 =head2 a consumer
@@ -188,14 +188,14 @@ A math example: every elements of fibo below 1000 (1 element a time in memory)
 
     now {say} takeWhile { $_ < 1000 } fibo 1,1;
 
-Used to shell? the Perlude version of 
+Used to shell? the Perlude version of
 
     yes "happy birthday" | sed 5q
 
-is 
+is
 
     sub yes ($msg) { sub { $msg } }
-    now {say} take 5, yes "happy birthday" 
+    now {say} take 5, yes "happy birthday"
 
 A sysop example: throw your shellscripts away
 
@@ -232,7 +232,7 @@ A sysop example: throw your shellscripts away
 
 When relevant, i used the Haskell Prelude documentation descriptions and
 examples. for example, the take documentation comes from
-L<http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take>. 
+L<http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#v:take>.
 
 =head1 Functions
 
@@ -263,35 +263,6 @@ compliant iterator.
         open my $fh,"foo";
         $fh;
     };
-
-=head3 as_open
-
-a simpler C<CORE::open> ... i guess ... (see also C<perldoc -f open> or
-C<perlopentut>).
-
-=over 4
-
-=item *
-
-it returns a filehandle instead of vivify one 
-
-=item *
-
-it circumvent prototype so you can pass a list.
-
-=back
-
-so as an example
-
-    open my $fh, '<:gzip' , '/tmp/foo.gz'
-
-can be writen as
-
-    my $fh = as_open qw( <:gzip /tmp/foo.gz );
-
-this function replace the undocumented C<open_file> from C<Perlude::Open> 
-as it is much more cleaner and reliable. However THIS SHOULD NOT BE IN PERLUDE!
-but i found nothing on CPAN to replace it.
 
 =head2 filters
 
@@ -376,7 +347,7 @@ except that:
 
 =over 4
 
-=item * 
+=item *
 
 pairs can use an anonymous hash
 
@@ -454,6 +425,42 @@ expose them as a single stream.
     sub cat { concatM {lines} ls shift }
     cat "/tmp/*.conf"
 
+=head2 File utils
+
+=head3 as_open
+
+a simpler C<CORE::open> ... i guess ... (see also C<perldoc -f open> or
+C<perlopentut>).
+
+=over 4
+
+=item *
+
+it returns a filehandle instead of vivify one
+
+=item *
+
+it circumvent prototype so you can pass a list.
+
+=back
+
+so as an example
+
+    open my $fh, '<:gzip' , '/tmp/foo.gz'
+
+can be writen as
+
+    my $fh = as_open qw( <:gzip /tmp/foo.gz );
+
+this function replace the undocumented C<open_file> from C<Perlude::Open>
+as it is much more cleaner and reliable. However THIS SHOULD NOT BE IN PERLUDE!
+but i found nothing on CPAN to replace it.
+
+=head3 lines
+
+use C<&as_open>) to coerce the arguments to a filehandle then returns an
+iterator on chomped lines of it.
+
 =head1 Perlude companions
 
 some modules comes with generators so they are perfect Perlude companions
@@ -471,7 +478,7 @@ some modules comes with generators so they are perfect Perlude companions
         -> and( sub { -r } )
         -> iter(qw( /tmp ));
 
-you can use C<filter> instead of C<and>: 
+you can use C<filter> instead of C<and>:
 
     now {print}
         take 3,
@@ -479,13 +486,13 @@ you can use C<filter> instead of C<and>:
         find->new
         -> file
         -> size('>1k')
-        -> iter(qw( /tmp )); 
+        -> iter(qw( /tmp ));
 
 =head1 C<Path::Tiny>
 
     use Path::Tiny;
 
-    now {print} take 3, path("/etc")->iterator;  
+    now {print} take 3, path("/etc")->iterator;
 
     now {print}
         take 3,
@@ -494,13 +501,13 @@ you can use C<filter> instead of C<and>:
 
 =head1 C<curry>
 
-a very friendly way to write iterators. i rewrote the exemple from the 
+a very friendly way to write iterators. i rewrote the exemple from the
 C<TAP::Parser> doc:
 
     use TAP::Parser;
-     
+
     my $parser = TAP::Parser->new( { tap => $output } );
-     
+
     while ( my $result = $parser->next ) {
         print $result->as_string;
     }
@@ -530,7 +537,7 @@ feedbacks and contributions are very welcome
 
 =over 4
 
-=item * 
+=item *
 
 Improve general quality:
 doc, have a look on L<http://cpants.cpanauthors.org/dist/perlude>,
@@ -538,12 +545,12 @@ L<https://metacpan.org/pod/Devel::Cover>.
 
 =item *
 
-Explore test suite to know what isn't well tested. find bugs :) 
+Explore test suite to know what isn't well tested. find bugs :)
 
-    * see range implementation # what if step 0 ? 
+    * see range implementation # what if step 0 ?
     * pairs must support streams and array
     * provide an alternative to takeWhile to return the combo breaker
-    * explore AST manipulations for futher optimizations 
+    * explore AST manipulations for futher optimizations
 
 =item * reboot C<Perl::builtins>
 
@@ -566,13 +573,13 @@ callback to treat entries onfly)
 
 =item *
 
-provide streamers for common sources CSV, LDAP, DBI (see C<p5-csv-stream>) 
+provide streamers for common sources CSV, LDAP, DBI (see C<p5-csv-stream>)
 
 =back
 
 =head1 KNOWN BUGS
 
-not anymore, if you find one, please email  bug-Perlude [at] rt.cpan.org. 
+not anymore, if you find one, please email  bug-Perlude [at] rt.cpan.org.
 
 =head1 AUTHORS
 
