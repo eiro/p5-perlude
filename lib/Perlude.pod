@@ -256,7 +256,8 @@ infinitly loop on a set of values
 
 =head3 records $ref
 
-given any kind of ref that implements the "<>" iterator, returns a Perlude compliant iterator.
+given any kind of ref that implements the "<>" iterator, returns a Perlude
+compliant iterator.
 
     now {print if /data/} records do {
         open my $fh,"foo";
@@ -265,54 +266,32 @@ given any kind of ref that implements the "<>" iterator, returns a Perlude compl
 
 =head3 as_open
 
-just easier (yet safer?) to use wrapper on the sub described in C<perldoc -f open>
-(also L<perlfunc/open>).
+a simpler C<CORE::open> ... i guess ... (see also C<perldoc -f open> or
+C<perlopentut>).
 
-the goal is to have an wrapper on open does a coercion (just return @_ if nothing to do). so
-
-=over 2
+=over 4
 
 =item *
 
-don't carre about prototype (so you can call it with an array, not only a list)
+it returns a filehandle instead of vivify one 
 
 =item *
 
-return a FILEHANDLE instead of having a side effect on the first variable
-
-=item *
-
-just return a FILEHANDLE passed as argument (so it's a coercion from C<@_> to an open handler).
-
-    open FILEHANDLE
-    open EXPR
-    open MODE,EXPR
-    open MODE,EXPR,LIST
-    open MODE,EXPR,REF
+it circumvent prototype so you can pass a list.
 
 =back
 
-=head3 lines @openargs
+so as an example
 
-if C<$openargs[0]> is a string, C<&open> @openargs (nothing done there if
-it's already a file handler).
+    open my $fh, '<:gzip' , '/tmp/foo.gz'
 
-return an iterator that chomp the records of the open file.
+can be writen as
 
-so
+    my $fh = as_open qw( <:gzip /tmp/foo.gz );
 
-    now {say} lines "/etc/passwd" 
-
-can be written like
-
-    now {say} apply { chomp; $_ } do {
-        open my $fh, "/etc/passwd";
-        sub {
-            return unless defined my $line = <$fh>;
-            chomp $line;
-            $line;
-        }
-    }
+this function replace the undocumented C<open_file> from C<Perlude::Open> 
+as it is much more cleaner and reliable. However THIS SHOULD NOT BE IN PERLUDE!
+but i found nothing on CPAN to replace it.
 
 =head2 filters
 
@@ -565,12 +544,6 @@ Explore test suite to know what isn't well tested. find bugs :)
     * pairs must support streams and array
     * provide an alternative to takeWhile to return the combo breaker
     * explore AST manipulations for futher optimizations 
-
-=item *
-
-deprecate open_file and lines (or/and find a companion) as it is out of the 
-scope of Perlude and open_file seems scary (anything to avoid the C<open>
-prototype?). 
 
 =item * reboot C<Perl::builtins>
 

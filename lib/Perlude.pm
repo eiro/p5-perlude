@@ -1,5 +1,5 @@
 package Perlude;
-use Perlude::Open;
+# use Perlude::Open;
 use strict;
 use warnings;
 use 5.10.0;
@@ -17,7 +17,7 @@ our @EXPORT = qw<
     pairs
     nth
     chunksOf
-    open_file
+    as_open
 >; 
 
 # ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! 
@@ -154,9 +154,28 @@ sub records {
     sub { <$source> // () }
 }
 
+sub as_open {
+
+    # arguments must please CORE::open
+
+    # nothing to be done if $_[0] is a filehandle already
+    my ($path) = map {return $_ if ref } shift || $_;
+    if ( ref $_[0] ) {
+        # more actions there ? 
+        # this could be Path::Tiny inspired ? 
+        # what about IO::All2 ?
+        # use Perl IO instead ?
+        # what if i can write
+        # my $fh = as_open qw( <:locked:utf-8:gzip'  /tmp/foo.zip ); 
+        ...
+    }
+
+    &CORE::open(my $fh, @_);
+    $fh 
+}
 
 sub lines {
-    my $fh = &open_file;
+    my $fh = &as_open;
     my $line;
     sub {
         return unless defined ( $line = <$fh> );
