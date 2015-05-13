@@ -309,6 +309,32 @@ drop $n $xs returns the suffix of $xs after the first $n elements, or () if $n >
     drop 3, range 1,2
     # ()
 
+=head3 tuple
+
+DEPRECATED: use splitEvery instead
+
+=head3 splitEvery
+
+from L<http://hackage.haskell.org/package/split-0.1.1/docs/Data-List-Split.html#v:splitEvery>. so
+
+    use Eirotic; 
+
+    say join ',',
+        fold apply { sprintf '(%s)', join ',', @$_ } 
+
+        splitEvery 5, range(1,20)
+
+    now {
+        printf '(%s)'
+        , join 
+
+    }
+
+    way
+
+    say YAML::Dump [ fold
+    ]
+
 =head3 dropWhile $predicate, $xs
 
 dropWhile $predicate, $xs returns the suffix remaining after dropWhile $predicate, $xs

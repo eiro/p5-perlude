@@ -11,7 +11,7 @@ our @EXPORT = qw<
     filter apply
     now
     cycle range
-    tuple
+    splitEvery
     concat concatC concatM
     records lines 
     pairs
@@ -238,10 +238,14 @@ sub range {
     }
 }
 
-
 sub tuple ($$) {
+    warn "tuple is deprecated in flavor of splitEvery";
+    &splitEvery
+}
+
+sub splitEvery ($$) {
     my ( $n, $i ) = @_;
-    croak "$n is not a valid parameter for tuple()" if $n <= 0;
+    croak "$n is not a valid parameter for splitEvery()" if $n <= 0;
     $i = _buffer $i;
     sub {
         my @v = fold take $n, $i;

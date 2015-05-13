@@ -11,25 +11,25 @@ done_testing;
 __END__
 
 my @tests =
-( [ fold => ( apply {@$_} tuple 3, unfold 1 .. 7 )
+( [ fold => ( apply {@$_} splitEvery 3, unfold 1 .. 7 )
   , [ 1 .. 7 ] ]
-, [ takeWhile => ( takeWhile { $_ % 2 } apply {@$_} tuple 3, unfold 1, 3, 5, 2, 7, 9 )
+, [ takeWhile => ( takeWhile { $_ % 2 } apply {@$_} splitEvery 3, unfold 1, 3, 5, 2, 7, 9 )
   , [ 1, 3, 5 ] ]
-, [ filter => ( filter { $_ % 2 } apply {@$_} tuple 3, unfold 1 .. 7 )
+, [ filter => ( filter { $_ % 2 } apply {@$_} splitEvery 3, unfold 1 .. 7 )
   , [ 1, 3, 5, 7 ] ]
-, [ take => ( take 5, apply {@$_} tuple 3, unfold 1 .. 100 )
+, [ take => ( take 5, apply {@$_} splitEvery 3, unfold 1 .. 100 )
   , [ 1 .. 5 ] ]
-, [ drop => ( drop 5, apply {@$_} tuple 3, unfold 1 .. 100 )
+, [ drop => ( drop 5, apply {@$_} splitEvery 3, unfold 1 .. 100 )
   , [ 6 .. 100 ] ]
-, [ apply => ( apply {@$_} tuple 17, unfold 1 .. 100 )
+, [ apply => ( apply {@$_} splitEvery 17, unfold 1 .. 100 )
   , [ 1 .. 100 ] ]
 , [ now => sub { # the state variable ensure the sub runs once only
-        ( state $i++ ) ? () : now { -$_ } apply {@$_} tuple 5,
+        ( state $i++ ) ? () : now { -$_ } apply {@$_} splitEvery 5,
             unfold 1 .. 10;
     }
   , [-10]
   ]
-, [ tuple => ( tuple 2, apply {@$_} tuple 3, unfold 0 .. 10 ),
+, [ splitEvery => ( splitEvery 2, apply {@$_} splitEvery 3, unfold 0 .. 10 ),
   , [ [ 0, 1 ], [ 2, 3 ], [ 4, 5 ], [ 6, 7 ], [ 8, 9 ], [10] ]
   ]
 );

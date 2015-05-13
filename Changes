@@ -1,5 +1,16 @@
 Revision history for Perlude
 
+0.80 FUTURE
+
+    * tuple removed (use splitEvery instead)
+
+0.62 WIP
+
+    * Perlude::open replaced by as_open
+    * splitEvery added, tuple deprecated
+    * tests on coverage added
+    * improved documentation and tests
+
 0.61    2015-05-11    Marc Chantreux
 
     * removed FUTURE text file as it's now present (also some bloat canceled)

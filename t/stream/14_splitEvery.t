@@ -19,16 +19,16 @@ plan tests => @pass + 2 * @fail;
 
 for my $t (@pass) {
     my ( $n, $i, @r ) = @$t;
-    is_deeply( [ fold tuple $n, \&$i ], \@r, "tuple $n" );
+    is_deeply( [ fold splitEvery $n, \&$i ], \@r, "splitEvery $n" );
 }
 
 for my $t (@fail) {
     my ( $n, $i ) = @$t;
-    ok( !eval { tuple $n, \&$i; 1 }, "tuple $n FAIL" );
+    ok( !eval { splitEvery $n, \&$i; 1 }, "splitEvery $n FAIL" );
     like(
         $@,
-        qr/^\Q$n\E is not a valid parameter for tuple\(\) at /,
-        "error message for tuple $n"
+        qr/^\Q$n\E is not a valid parameter for splitEvery\(\) at /,
+        "error message for splitEvery $n"
     );
 }
 
