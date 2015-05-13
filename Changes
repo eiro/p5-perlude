@@ -7,6 +7,7 @@ Revision history for Perlude
 0.62 WIP
 
     * Perlude::open replaced by as_open
+    * Perlude::Lazy deprecated
     * splitEvery added, tuple deprecated
     * tests on coverage added
     * improved documentation and tests

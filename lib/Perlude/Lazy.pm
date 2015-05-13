@@ -19,6 +19,26 @@ our @EXPORT = qw<
 
 >;
 
+=head1 Perlude::Lazy is deprecated
+
+this module was an attempt to implement real lazy lists instead of streams but 
+
+=over 4 
+
+=item *
+
+it really needs more engineering
+
+=item *
+
+no one use it for real (if you did, just tell me)
+
+=back
+
+all related tests are moved into C<xt/lazy> waiting for someone to hack on it again.
+
+=cut
+
 use Carp;
 
 # End-of-list value: always return itself, with no data

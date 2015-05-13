@@ -576,11 +576,6 @@ remove the hardcoded C<f> namespace and use C<use aliased> instead.
 
 =item *
 
-ask for BooK and Dolmen if they mind to remove C<Perlude::Lazy> as noone seems
-to use it anymore.
-
-=item *
-
 C<Perlude::XS> anyone ?
 
 =item *
