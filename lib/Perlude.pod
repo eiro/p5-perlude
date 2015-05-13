@@ -268,13 +268,13 @@ compliant iterator.
 
 filters are composition functions that take a stream and returns a modified stream.
 
-=head3 filter $xs
+=head3 filter $filter, $xs
 
 the Perlude counterpart of C<grep>.
 
     sub odds () { filter { $_ % 2 } shift }
 
-=head3 apply
+=head3 apply $application, $xs
 
 the Perlude counterpart of C<map>.
 
@@ -317,23 +317,15 @@ DEPRECATED: use splitEvery instead
 
 from L<http://hackage.haskell.org/package/split-0.1.1/docs/Data-List-Split.html#v:splitEvery>. so
 
-    use Eirotic; 
-
-    say join ',',
+    say join ",\n",
         fold apply { sprintf '(%s)', join ',', @$_ } 
+        splitEvery 5,
+        range(1,20) 
 
-        splitEvery 5, range(1,20)
-
-    now {
-        printf '(%s)'
-        , join 
-
-    }
-
-    way
-
-    say YAML::Dump [ fold
-    ]
+    # (1,2,3,4,5),
+    # (6,7,8,9,10),
+    # (11,12,13,14,15),
+    # (16,17,18,19,20)
 
 =head3 dropWhile $predicate, $xs
 
@@ -403,7 +395,7 @@ returns the array of all the elements computed by $xs
     say join ',',      take 5, sub { state $x=-2; $x+=2 } # CODE(0x180bad8)
     say join ',', fold take 5, sub { state $x=-2; $x+=2 } # 0,2,4,6,8
 
-see also unfold
+see also C<unfold>
 
 =head3 nth $xs
 
