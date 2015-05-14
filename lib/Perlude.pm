@@ -24,7 +24,16 @@ our @EXPORT = qw<
 
 use Carp;
 
-our $VERSION = '0.61';
+our $VERSION   = '0.61';
+our $EXHAUSTED = sub {()};
+
+
+sub _natural_from {
+    my ($fn, $pos, $v) = @_;
+    defined $v && $v =~ /^\s*(\d+)/ or croak
+        "the $fn argument $pos is '$v' when natural number expected";
+    $1;
+} 
 
 sub pairs ($) {
     my ( $ref ) = @_;
@@ -117,6 +126,8 @@ sub filter (&$) {
 
 sub take ($$) {
     my ( $n, $i ) = @_;
+    $n = _natural_from take => 1, $n;
+    return $EXHAUSTED unless $n;
     $i = _buffer $i;
     sub {
         $n-- > 0 or return;
@@ -125,7 +136,11 @@ sub take ($$) {
 }
 
 sub drop ($$) {
+    # naive is 
+    # fold take $n, $xs; ()
     my ( $n, $i ) = @_;
+    $n = _natural_from drop => 1, $n;
+    return $EXHAUSTED unless $n;
     $i = _buffer $i;
     fold take $n, $i;
     $i;
@@ -245,6 +260,7 @@ sub tuple ($$) {
 
 sub splitEvery ($$) {
     my ( $n, $i ) = @_;
+    $n = _natural_from drop => 1, $n;
     croak "$n is not a valid parameter for splitEvery()" if $n <= 0;
     $i = _buffer $i;
     sub {
