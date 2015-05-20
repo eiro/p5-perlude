@@ -1,6 +1,8 @@
 #! /usr/bin/perl
 use Perlude;
 use Test::More;
+use strict;
+use warnings;
 
 my $expected = [ romanes => '' => qw( eunt domus ) => '' ];
 
