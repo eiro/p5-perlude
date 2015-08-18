@@ -238,6 +238,51 @@ L<http://hackage.haskell.org/packages/archive/base/latest/doc/html/Prelude.html#
 
 =head2 generators
 
+=head3 oterate ($iter,$filter,$self) # EXPERIMENTAL
+
+it's B<Oterate> (like Object Iterate). the basic boring pattern is 
+
+    my $tap = TAP::Parser->new({qw( source test)});
+    while (my $e = $tap->next) {
+        if ($e->is_ok) { say $e->as_string }
+    }
+
+replacing it by perlude gives you power but the code
+still isn't pleasant to read.
+
+    now {say $_->as_string}
+        filter {$_->is_ok}
+        sub {
+            state $tap = TAP::Parser->new({qw( source test)});
+            $tap->next // ()
+        }
+
+Perlude + L<https://metacpan.org/pod/curry> does it better
+
+    now {say $_->as_string}
+        filter {$_->is_ok}
+        TAP::Parser
+        -> new({qw( source test)})
+        -> curry::next;
+
+oterate does the same, plus adds the filter into the generator
+
+    oterate qw(next is_ok)
+    , TAP::Parser->new({qw( source test)})
+
+using array ref, you can also add arguments to both the iterator and the
+filter:
+
+    oterate
+    , [qw( next file     )]
+    , [qw( is   readable )]
+    , Some->new
+
+is like
+
+    filter {$_->is('readable')} Some->new->curry::next('file')
+
+
 =head3 range $begin, [ $end, [ $step ] ]
 
 A range of numbers from $begin to $end (infinity if $end isn't set) $step by $step.

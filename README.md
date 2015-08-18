@@ -9,3 +9,4 @@ Current version is broken with perl < 5.16 because
  or just *remove* `lines` from the perlude core (it is a very wrong place)
 * yada (`...`) was introduced in perl 5.14 AFAIK
 * investigate possible bug in range with 1 argument
+* missing tests for oterate

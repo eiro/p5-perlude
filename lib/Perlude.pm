@@ -18,15 +18,33 @@ our @EXPORT = qw<
     nth
     chunksOf
     as_open
+    oterate
 >; 
 
-# ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scrpting now! 
+# ABSTRACT: Shell and Powershell pipes, haskell keywords mixed with the awesomeness of perl. forget shell scripting now! 
 
 use Carp;
 
 our $VERSION   = '0.61';
 our $EXHAUSTED = sub {()};
 
+sub oterate {
+    my ($iter,$filter,$self) = @_;
+    my ( $i, @i ) = ref $iter   ? @$iter   : $iter  ;
+    my ( $f, @f)  = ref $filter ? @$filter : $filter;
+    my $exhausted = 0;
+    my @v;
+    sub {
+
+        return if $exhausted;
+
+        do { @v and return shift @v }
+           while (@v = $self->$i(@i));
+
+        $exhausted=1;
+        return;
+    }
+};
 
 sub _natural_from {
     my ($fn, $pos, $v) = @_;
