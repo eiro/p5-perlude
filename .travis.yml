@@ -1,5 +1,8 @@
 language: perl
-perl: [ "5.20", 5.18, 5.16, 5.14, 5.12, "5.10" ]
+# remove support of 5.16 version 'til
+# we remove lines() (and Perlude::Open)
+perl: [ "5.20", 5.18, 5.16 ]
+# perl: [ "5.20", 5.18, 5.16, 5.14, 5.12, "5.10" ]
 install:
    # Deal with all of the DZIL dependancies, quickly and quietly
    - cpanm --quiet --notest --skip-satisfied Dist::Zilla
